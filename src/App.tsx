@@ -7,7 +7,7 @@ import MainPage from "./pages/Main";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/parcel-twa">
       <Routes>
         <Route path="/" element={<MainPage />} />
         {routes.map((route) => (
