@@ -31,7 +31,6 @@ export const authenticateUser = async (initData: WebAppInitData) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({ initData }),
     });
