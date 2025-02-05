@@ -1,6 +1,5 @@
 import { User } from "@supabase/supabase-js";
 import supabase from "./supabaseClient";
-import { WebAppInitData } from "@twa-dev/types";
 
 export const createUser = async (user: User) => {
   const { data, error } = await supabase.from("users").insert(user);
@@ -18,7 +17,7 @@ export const updateUser = async (user: User) => {
   return data;
 };
 
-export const authenticateUser = async (initData: WebAppInitData) => {
+export const authenticateUser = async (initData: string) => {
 
   if (!initData) {
       console.error("No Telegram init data found");

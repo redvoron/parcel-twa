@@ -3,7 +3,6 @@ import { routes } from "../utils/routes";
 import { Button, List } from "antd";
 import { useNavigate } from "react-router-dom";
 import { authenticateUser } from "../data/users";
-import { WebAppInitData } from "@twa-dev/types";
 import WebApp from "@twa-dev/sdk";
 const MainPage = () => {
   const { t } = useTranslation();
@@ -11,7 +10,7 @@ const MainPage = () => {
   const handleCellClick = (path: string) => {
     navigate(path);
   };
-  const userData: WebAppInitData = WebApp.initDataUnsafe;
+  const userData: string = WebApp.initData;
 
   return (
     <div className="page">
