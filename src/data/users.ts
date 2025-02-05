@@ -26,13 +26,21 @@ export const authenticateUser = async (initData: WebAppInitData) => {
   }
 
   try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-auth`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData }),
-      });
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-auth`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({ initData }),
+    });
 
-      const { auth_id } = await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const { auth_id } = await response.json();
 
       const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "telegram",
