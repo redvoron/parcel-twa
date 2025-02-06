@@ -1,6 +1,4 @@
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
-import { crypto } from "https://deno.land/std@0.204.0/crypto/mod.ts"
-import { encodeHex } from "https://deno.land/std@0.204.0/encoding/hex.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import hmac_sha256 from "https://deno.land/x/hmacsha256/hmac-sha256-deno.mjs";
 
@@ -107,7 +105,6 @@ serve(async (req) => {
   }
 
   const { initData } = await req.json();
-  console.log('initData', JSON.stringify(initData))
   if (!await verifyTelegramAuth(initData)) {
     console.log('invalid telegram data')
     return new Response(JSON.stringify({ error: "Invalid Telegram data" }), {
@@ -119,12 +116,6 @@ serve(async (req) => {
 
   const { telegramId, username, firstName, lastName, avatarUrl } =
     extractUserData(initData);
-
-  console.log("telegramId", telegramId);
-  console.log("username", username);
-  console.log("firstName", firstName);
-  console.log("lastName", lastName);
-  console.log("avatarUrl", avatarUrl);
 
 const { data: existingUser, error: userError } = await supabase
   .from("users")
@@ -145,15 +136,14 @@ if (userError) {
 
 let authUserId = existingUser?.auth_id;
 if (!authUserId) {
-  console.log("create new user");
-  // Здесь логика создания нового пользователя
   const { data: newUser, error } = await supabase.auth.admin.createUser({
+    email: `${telegramId}@parcel.app.user`,
     user_metadata: {
       telegram_id: telegramId,
       username,
       first_name: firstName,
-      lastName,
-      avatarUrl,
+      last_name: lastName,
+      avatar_url: avatarUrl,
     },
   });
 
@@ -164,8 +154,8 @@ if (!authUserId) {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-
-  authUserId = newUser.id;
+  console.log('newUser', JSON.stringify(newUser))
+  authUserId = newUser?.user?.id;
 
   await supabase.from("users").insert({
     auth_id: authUserId,

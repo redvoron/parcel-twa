@@ -8,14 +8,17 @@ import { useState } from "react";
 const MainPage = () => {
   const { t } = useTranslation();
   const [authResponse, setAuthResponse] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleCellClick = (path: string) => {
     navigate(path);
   };
   const userData: string = WebApp.initData;
   const handleAuth = async () => {
+    setLoading(true);
     const response = await authenticateUser(userData);
     setAuthResponse(response);
+    setLoading(false);
   };
   return (
     <div className="page">
@@ -29,8 +32,7 @@ const MainPage = () => {
           </List.Item>
         ))}
       </List>
-      {JSON.stringify(userData)}
-      <Button onClick={handleAuth}>Auth User</Button>
+      <Button onClick={handleAuth} loading={loading}>Auth User</Button>
       {authResponse && <div>{authResponse}</div>}
     </div>
   );
