@@ -19,21 +19,16 @@ async function computeTelegramSignatureUniversal(
 ): Promise<string> {
   const encoder = new TextEncoder();
 
-  // Вычисляем промежуточный ключ:
-  // Поведение аналогично: crypto.createHmac('sha256', 'WebAppData').update(TELEGRAM_BOT_TOKEN).digest();
   const intermediateKey = await hmac_sha256(
     encoder.encode(telegramBotToken),
     encoder.encode("WebAppData"),
   );
 
-  // Вычисляем итоговую подпись:
-  // Аналог: crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
   const signatureBuffer = await hmac_sha256(
     encoder.encode(checkString),
     intermediateKey,
   );
 
-  // Преобразуем Uint8Array в hex-строку
   const signature = Array.from(new Uint8Array(signatureBuffer))
   .map((byte) => byte.toString(16).padStart(2, "0"))
   .join("");
@@ -53,13 +48,44 @@ export const verifyTelegramAuth = async (telegramInitData: string): Promise<bool
   const signature = await computeTelegramSignatureUniversal(TELEGRAM_BOT_TOKEN, checkString);
 
 
-  console.log("data.hash:", data.hash);
-  console.log("signature:", signature);
-
-  return true;
-  // return signature === data.hash;
+   return signature === data.hash;
 };
 
+function extractUserData(initData: string) {
+  const params = new URLSearchParams(initData);
+  let userData = {} as {
+    id?: number;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    photo_url?: string;
+  };
+
+  // Если параметр "user" присутствует — парсим как JSON
+  if (params.has("user")) {
+    try {
+      userData = JSON.parse(params.get("user") as string);
+    } catch (error) {
+      console.error("Ошибка парсинга JSON из параметра 'user':", error);
+    }
+  }
+
+  // Поддержка обратной совместимости, если данные приходят плоско
+  const telegramId = userData.id ?? Number(params.get("id"));
+  const username =
+    userData.username || params.get("username") || `user${telegramId}`;
+  const firstName = userData.first_name || params.get("first_name") || "";
+  const lastName = userData.last_name || params.get("last_name") || "";
+  const avatarUrl = userData.photo_url || params.get("photo_url") || "";
+
+  return {
+    telegramId,
+    username,
+    firstName,
+    lastName,
+    avatarUrl,
+  };
+}
 serve(async (req) => {
   // Определяем CORS заголовки
   const corsHeaders = {
@@ -81,7 +107,7 @@ serve(async (req) => {
   }
 
   const { initData } = await req.json();
-  console.log('initData', initData)
+  console.log('initData', JSON.stringify(initData))
   if (!await verifyTelegramAuth(initData)) {
     console.log('invalid telegram data')
     return new Response(JSON.stringify({ error: "Invalid Telegram data" }), {
@@ -91,63 +117,65 @@ serve(async (req) => {
   }
 
 
-  const params = new URLSearchParams(initData);
-  const telegramId = params.get("id")!;
-  const username = params.get("username") ?? `user${telegramId}`;
-  const firstName = params.get("first_name") ?? "";
-  const lastName = params.get("last_name") ?? "";
-  const avatarUrl = params.get("photo_url") ?? "";
-  console.log('params', params)
-  console.log('telegramId', telegramId)
-  console.log('username', username)
-  console.log('firstName', firstName)
-  console.log('lastName', lastName)
-  console.log('avatarUrl', avatarUrl)
-  const { data: existingUser, error: userError } = await supabase
-    .from("users")
-    .select("auth_id")
-    .eq("telegram_id", telegramId)
-    .single();
+  const { telegramId, username, firstName, lastName, avatarUrl } =
+    extractUserData(initData);
 
-  let authUserId = existingUser?.auth_id;
-  if (userError) {
-    console.log('userError', userError)
-    return new Response(JSON.stringify({ error: userError.message }), {
+  console.log("telegramId", telegramId);
+  console.log("username", username);
+  console.log("firstName", firstName);
+  console.log("lastName", lastName);
+  console.log("avatarUrl", avatarUrl);
+
+const { data: existingUser, error: userError } = await supabase
+  .from("users")
+  .select("auth_id")
+  .eq("telegram_id", telegramId)
+  .maybeSingle();
+
+if (userError) {
+  console.error("userError", userError);
+  return new Response(
+    JSON.stringify({ error: userError.message }),
+    {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    }
+  );
+}
+
+let authUserId = existingUser?.auth_id;
+if (!authUserId) {
+  console.log("create new user");
+  // Здесь логика создания нового пользователя
+  const { data: newUser, error } = await supabase.auth.admin.createUser({
+    user_metadata: {
+      telegram_id: telegramId,
+      username,
+      first_name: firstName,
+      lastName,
+      avatarUrl,
+    },
+  });
+
+  if (error) {
+    console.log("creating user error", error);
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-  if (!authUserId) {
-    console.log('create new user')
-    const { data: newUser, error } = await supabase.auth.admin.createUser({
-      user_metadata: {
-        telegram_id: telegramId,
-        username,
-        first_name: firstName,
-        lastName,
-        avatarUrl,
-      },
-    });
 
-    if (error) {
-      console.log('creating user error', error)
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+  authUserId = newUser.id;
 
-    authUserId = newUser.id;
-
-    await supabase.from("users").insert({
-      auth_id: authUserId,
-      telegram_id: telegramId,
-      username,
-      first_name: firstName,
-      last_name: lastName,
-      avatar_url: avatarUrl,
-    });
-  }
+  await supabase.from("users").insert({
+    auth_id: authUserId,
+    telegram_id: telegramId,
+    username,
+    first_name: firstName,
+    last_name: lastName,
+    avatar_url: avatarUrl,
+  });
+}
 
   return new Response(
     JSON.stringify({ auth_id: authUserId }),

@@ -17,11 +17,11 @@ export const updateUser = async (user: User) => {
   return data;
 };
 
-export const authenticateUser = async (initData: string) => {
+export const authenticateUser = async (initData: string): Promise<string> => {
 
   if (!initData) {
       console.error("No Telegram init data found");
-      return;
+      return 'no data';
   }
 
   try {
@@ -50,7 +50,10 @@ export const authenticateUser = async (initData: string) => {
       } else {
           console.log("Authenticated user:", data);
       }
+      return 'success';
   } catch (error) {
       console.error("Auth request failed:", error);
+      return 'failed';
   }
+  
 }
