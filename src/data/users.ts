@@ -20,8 +20,7 @@ export const updateUser = async (user: User) => {
 export const authenticateUser = async (initData: string): Promise<string> => {
 
   if (!initData) {
-      console.error("No Telegram init data found");
-      return 'no data';
+      return 'No Telegram init data found';
   }
 
   try {
@@ -35,7 +34,7 @@ export const authenticateUser = async (initData: string): Promise<string> => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return(`HTTP error! status: ${response.status}`);
     }
 
     const { auth_id } = await response.json();
@@ -46,14 +45,14 @@ export const authenticateUser = async (initData: string): Promise<string> => {
       });
 
       if (error) {
-          console.error("Supabase auth error:", error);
+          return(`Supabase auth error: ${JSON.stringify(error)}`);
+          
       } else {
-          console.log("Authenticated user:", data);
+          return(`Authenticated user: ${JSON.stringify(data)}`);
+          
       }
-      return 'success';
   } catch (error) {
-      console.error("Auth request failed:", error);
-      return 'failed';
+      return(`Auth request failed: ${JSON.stringify(error)}`);
   }
   
 }
