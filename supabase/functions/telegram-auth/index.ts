@@ -133,7 +133,7 @@ if (userError) {
     }
   );
 }
-
+console.log('existingUser', telegramId, JSON.stringify(existingUser))
 let authUserId = existingUser?.auth_id;
 if (!authUserId) {
   const { data: newUser, error } = await supabase.auth.admin.createUser({
