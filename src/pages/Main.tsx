@@ -15,6 +15,7 @@ const MainPage = () => {
   };
   const userData: string = WebApp.initData;
   const handleAuth = async () => {
+    setAuthResponse(null);
     setLoading(true);
     const response = await authenticateUser(userData);
     setAuthResponse(response);

@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import hmac_sha256 from "https://deno.land/x/hmacsha256/hmac-sha256-deno.mjs";
+import * as jwt from "https://deno.land/x/djwt@v2.9.1/mod.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
+const SUPABASE_JWT_SECRET = Deno.env.get("SUPABASE_JWT_SECRET")!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -166,9 +168,17 @@ if (!authUserId) {
     avatar_url: avatarUrl,
   });
 }
-
+  const token = jwt.sign(
+    {
+        sub: telegramId,
+        username: `user_${telegramId}`,
+        provider: "telegram",
+    },
+    SUPABASE_JWT_SECRET,
+    { expiresIn: "7d" }
+  );
   return new Response(
-    JSON.stringify({ auth_id: authUserId }),
+    JSON.stringify({ auth_id: authUserId, token }),
     { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 });

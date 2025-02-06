@@ -37,15 +37,14 @@ export const authenticateUser = async (initData: string): Promise<string> => {
       return(`HTTP error! status: ${response.status}`);
     }
 
-    const { auth_id } = await response.json();
+    const { auth_id, token } = await response.json();
       const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "telegram",
-          token: auth_id,
-          nonce: crypto.randomUUID(),
+          token
       });
 
       if (error) {
-          return(`Supabase auth error ${auth_id}: ${JSON.stringify(error)}`);
+          return(`Supabase auth error ${auth_id}: ${JSON.stringify(error.message)}`);
           
       } else {
           return(`Authenticated user: ${JSON.stringify(data)}`);
