@@ -38,18 +38,30 @@ export const authenticateUser = async (initData: string): Promise<string> => {
     }
 
     const { auth_id, token, email } = await response.json();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email,
       password: token,
+      options: {
+        data: {
+          auth_id,
+        }
+      }
     });
 
-      if (error) {
-          return(`Supabase auth error ${auth_id}: ${JSON.stringify(error.message)}`);
-          
-      } else {
-          return(`Authenticated user: ${JSON.stringify(data)}`);
-          
+    if (signUpError) {
+      // Если пользователь уже существует, пробуем войти
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: token,
+      });
+
+      if (signInError) {
+        return `Supabase auth error ${auth_id}: ${JSON.stringify(signInError.message)}`;
       }
+      return `Authenticated user: ${JSON.stringify(signInData)}`;
+    }
+
+    return `Created and authenticated user: ${JSON.stringify(signUpData)}`;
   } catch (error) {
       return(`Auth request failed: ${JSON.stringify(error)}`);
   }

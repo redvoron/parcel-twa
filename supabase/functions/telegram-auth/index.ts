@@ -7,6 +7,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const SUPABASE_JWT_SECRET = Deno.env.get("PROJECT_JWT_SECRET")!;
+const MAIL_DOMAIN = 'parcel.app.user';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -89,6 +90,27 @@ function extractUserData(initData: string) {
     avatarUrl,
   };
 }
+async function createPasswordToken(telegramId: number) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(SUPABASE_JWT_SECRET.slice(0, 72)),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+
+  const token = await jwt.create(
+    { alg: "HS256", typ: "JWT" },
+    {
+      sub: telegramId,
+      username: `user_${telegramId}`,
+      provider: "telegram",
+    },
+    key 
+  );
+
+  return token.slice(8,64);
+}
 serve(async (req) => {
   // Определяем CORS заголовки
   const corsHeaders = {
@@ -121,7 +143,7 @@ serve(async (req) => {
 
   const { telegramId, username, firstName, lastName, avatarUrl } =
     extractUserData(initData);
-
+  const userPassword = await createPasswordToken(telegramId);
   const { data: existingUser, error: userError } = await supabase
     .from("users")
     .select("auth_id")
@@ -139,7 +161,8 @@ serve(async (req) => {
   let authUserId = existingUser?.auth_id;
   if (!authUserId) {
     const { data: newUser, error } = await supabase.auth.admin.createUser({
-      email: `${telegramId}@parcel.app.user`,
+      email: `${telegramId}@${MAIL_DOMAIN}`,
+      password: userPassword,
       user_metadata: {
         telegram_id: telegramId,
         username,
@@ -169,27 +192,10 @@ serve(async (req) => {
     });
   }
   console.log("SUPABASE_JWT_SECRET", SUPABASE_JWT_SECRET);
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(SUPABASE_JWT_SECRET),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
 
-  const token = await jwt.create(
-    { alg: "HS256", typ: "JWT" },
-    {
-      sub: telegramId,
-      username: `user_${telegramId}`,
-      provider: "telegram",
-      exp: new Date().getTime() + 7 * 24 * 60 * 60 * 1000, // 7 дней
-    },
-    key 
-  );
 
-  console.log("token", token);
-  return new Response(JSON.stringify({ auth_id: authUserId, token }), {
+  console.log("token", userPassword);
+  return new Response(JSON.stringify({ auth_id: authUserId, token: userPassword, email: `${telegramId}@${MAIL_DOMAIN}` }), {
     status: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
