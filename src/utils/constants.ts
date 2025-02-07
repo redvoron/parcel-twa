@@ -1,3 +1,5 @@
+import WebApp from "@twa-dev/sdk";
+
 export enum OrdersStatus {
   PENDING = "pending",
   COMPLETED = "completed",
@@ -27,4 +29,9 @@ export type AuthResult = {
 export enum AuthResultType {
   SUCCESS = "success",
   ERROR = "error",
+}
+
+export interface GlobalContextType {
+  webApp: typeof WebApp;
+  userContext: AuthResult | null;
 }

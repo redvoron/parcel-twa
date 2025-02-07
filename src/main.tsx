@@ -7,9 +7,10 @@ import './index.css'
 import WebApp from '@twa-dev/sdk'
 import { LoadingOutlined } from "@ant-design/icons";
 import { authenticateUser } from './data/users.ts';
+import { GlobalContextType } from './utils/constants';
 
-const globalContext = {webApp: WebApp, userContext: null};
-export const GlobalContext = createContext(globalContext);
+const globalContext: GlobalContextType = {webApp: WebApp, userContext: null};
+export const GlobalContext = createContext<GlobalContextType>(globalContext);
 
 const telegramTheme = {
   token: {
