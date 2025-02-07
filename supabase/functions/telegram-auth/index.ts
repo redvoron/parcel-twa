@@ -158,6 +158,7 @@ serve(async (req) => {
   }
 
   let authUserId = existingUser?.auth_id;
+  let emailConfirmed = existingUser?.email_confirmed_at;
   if (!authUserId) {
     const { data: newUser, error } = await supabase.auth.admin.createUser({
       email: `${telegramId}@${MAIL_DOMAIN}`,
@@ -178,7 +179,7 @@ serve(async (req) => {
       });
     }
     authUserId = newUser?.user?.id;
-
+    emailConfirmed = newUser?.user?.email_confirmed_at;
     await supabase.from("users").insert({
       auth_id: authUserId,
       telegram_id: telegramId,
@@ -190,7 +191,7 @@ serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ auth_id: authUserId, token: userPassword, email: `${telegramId}@${MAIL_DOMAIN}` }), {
+  return new Response(JSON.stringify({ auth_id: authUserId, token: userPassword, email: `${telegramId}@${MAIL_DOMAIN}`, email_confirmed: emailConfirmed }), {
     status: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
