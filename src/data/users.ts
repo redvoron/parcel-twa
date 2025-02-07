@@ -51,7 +51,7 @@ export const authenticateUser = async (initData: string): Promise<AuthResult> =>
       }
     });
 
-    if (signUpError) {
+    if (signUpError && signUpError.code !== 'user_already_exists') {
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: token,
