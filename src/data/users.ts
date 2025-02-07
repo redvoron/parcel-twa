@@ -2,19 +2,23 @@ import supabase from "./supabaseClient";
 import { AuthResult, AuthResultType } from "../utils/constants";
 
 export const updateUserMeta = async (userId: string, userMeta: string) => {
-  console.log("userMeta", userMeta);
-  const decodedMeta = decodeURIComponent(userMeta);
-  console.log("decodedMeta", decodedMeta);
-  const meta = JSON.parse(decodedMeta);
-  console.log("meta", meta);
-  const { data, error } = await supabase
-    .from("users")
-    .update({ meta })
-    .eq("id", userId);
-  if (error) {
+  try {
+    console.log("userMeta", userMeta);
+    const decodedMeta = decodeURIComponent(userMeta);
+    console.log("decodedMeta", decodedMeta);
+    const meta = JSON.parse(decodedMeta);
+    console.log("meta", meta);
+    const { data, error } = await supabase
+      .from("users")
+      .update({ meta })
+      .eq("id", userId);
+    if (error) {
+      console.error("Error updating user meta:", error);
+    }
+    return data;
+  } catch (error) {
     console.error("Error updating user meta:", error);
   }
-  return data;
 };
 
 export const authenticateUser = async (
