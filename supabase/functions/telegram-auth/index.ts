@@ -66,7 +66,6 @@ function extractUserData(initData: string) {
     photo_url?: string;
   };
 
-  // Если параметр "user" присутствует — парсим как JSON
   if (params.has("user")) {
     try {
       userData = JSON.parse(params.get("user") as string);
@@ -75,7 +74,6 @@ function extractUserData(initData: string) {
     }
   }
 
-  // Поддержка обратной совместимости, если данные приходят плоско
   const telegramId = userData.id ?? Number(params.get("id"));
   const username =
     userData.username || params.get("username") || `user${telegramId}`;
