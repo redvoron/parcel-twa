@@ -16,10 +16,12 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
       auth_date: params.get('auth_date'),
       hash: params.get('hash')
     };
+    console.log("meta", meta);
+
     const { data, error } = await supabase
       .from("users")
       .update({ meta })
-      .eq("id", userId);
+      .eq("auth_id", userId);
     if (error) {
       console.error("Error updating user meta:", error);
     }
