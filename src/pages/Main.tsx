@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { authenticateUser } from "../data/users";
 import WebApp from "@twa-dev/sdk";
 import { useState } from "react";
+import { AuthResult } from "../utils/constants";
+
 const MainPage = () => {
   const { t } = useTranslation();
-  const [authResponse, setAuthResponse] = useState<string | null>(null);
+  const [authResponse, setAuthResponse] = useState<AuthResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleCellClick = (path: string) => {
@@ -34,7 +36,7 @@ const MainPage = () => {
         ))}
       </List>
       <Button onClick={handleAuth} loading={loading}>Auth User</Button>
-      {authResponse && <div>{authResponse}</div>}
+      {authResponse && <div>{authResponse.message}</div>}
     </div>
   );
 };

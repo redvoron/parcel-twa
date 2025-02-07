@@ -17,3 +17,14 @@ export enum UserActions {
   UPDATE = "update",
   DELETE = "delete",
 }
+
+export type AuthResult = {
+  result: AuthResultType;
+  message: string;
+  data: unknown;
+}
+
+export enum AuthResultType {
+  SUCCESS = "success",
+  ERROR = "error",
+}

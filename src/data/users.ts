@@ -1,26 +1,25 @@
-import { User } from "@supabase/supabase-js";
 import supabase from "./supabaseClient";
+import { AuthResult, AuthResultType } from "../utils/constants";
 
-export const createUser = async (user: User) => {
-  const { data, error } = await supabase.from("users").insert(user);
+
+
+export const updateUserMeta = async (userId: string, userMeta: string) => {
+  const meta = JSON.parse(userMeta);
+  const { data, error } = await supabase.from("users").update({ meta }).eq("id", userId);
   if (error) {
     throw error;
   }
   return data;
 };
 
-export const updateUser = async (user: User) => {
-  const { data, error } = await supabase.from("users").update(user).eq("id", user.id);
-  if (error) {
-    throw error;
-  }
-  return data;
-};
-
-export const authenticateUser = async (initData: string): Promise<string> => {
+export const authenticateUser = async (initData: string): Promise<AuthResult> => {
 
   if (!initData) {
-      return 'No Telegram init data found';
+      return {
+        result: AuthResultType.ERROR,
+        message: 'No Telegram init data found',
+        data: null
+      };
   }
 
   try {
@@ -34,7 +33,11 @@ export const authenticateUser = async (initData: string): Promise<string> => {
     });
 
     if (!response.ok) {
-      return(`HTTP error! status: ${response.status}`);
+      return {
+        result: AuthResultType.ERROR,
+        message: `HTTP error! : ${response.status}`,
+        data: response.statusText
+      };
     }
 
     const { auth_id, token, email } = await response.json();
@@ -56,14 +59,32 @@ export const authenticateUser = async (initData: string): Promise<string> => {
       });
 
       if (signInError) {
-        return `Supabase auth error ${auth_id}: ${JSON.stringify(signInError.message)}`;
+        return {
+          result: AuthResultType.ERROR,
+          message: `Supabase auth error`,
+          data: signInError.message
+        };
       }
-      return `Authenticated user: ${JSON.stringify(signInData)}`;
+      
+      await updateUserMeta(signInData.user.id, initData);
+      return {
+        result: AuthResultType.SUCCESS,
+        message: `User authenticated`,
+        data: signInData
+      };
     }
 
-    return `Created and authenticated user: ${JSON.stringify(signUpData)}`;
+    return {
+      result: AuthResultType.SUCCESS,
+      message: `User created and authenticated`,
+      data: signUpData
+    };
   } catch (error) {
-      return(`Auth request failed: ${JSON.stringify(error)}`);
+      return {
+        result: AuthResultType.ERROR,
+        message: `Auth request failed`,
+        data: error
+      };
   }
   
 }

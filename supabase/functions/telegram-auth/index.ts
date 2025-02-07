@@ -8,6 +8,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const SUPABASE_JWT_SECRET = Deno.env.get("PROJECT_JWT_SECRET")!;
 const MAIL_DOMAIN = 'parcel.app.user';
+const APP_DOMAIN = 'redvoron.github.io';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -114,7 +115,7 @@ async function createPasswordToken(telegramId: number) {
 serve(async (req) => {
   // Определяем CORS заголовки
   const corsHeaders = {
-    "Access-Control-Allow-Origin": "https://redvoron.github.io",
+    "Access-Control-Allow-Origin": `https://${APP_DOMAIN}`,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type",
@@ -134,7 +135,6 @@ serve(async (req) => {
 
   const { initData } = await req.json();
   if (!(await verifyTelegramAuth(initData))) {
-    console.log("invalid telegram data");
     return new Response(JSON.stringify({ error: "Invalid Telegram data" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -151,13 +151,12 @@ serve(async (req) => {
     .maybeSingle();
 
   if (userError) {
-    console.error("userError", userError);
     return new Response(JSON.stringify({ error: userError.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-  console.log("existingUser", telegramId, JSON.stringify(existingUser));
+
   let authUserId = existingUser?.auth_id;
   if (!authUserId) {
     const { data: newUser, error } = await supabase.auth.admin.createUser({
@@ -173,13 +172,11 @@ serve(async (req) => {
     });
 
     if (error) {
-      console.log("creating user error", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    console.log("newUser", JSON.stringify(newUser));
     authUserId = newUser?.user?.id;
 
     await supabase.from("users").insert({
@@ -189,12 +186,10 @@ serve(async (req) => {
       first_name: firstName,
       last_name: lastName,
       avatar_url: avatarUrl,
+      meta: JSON.parse(initData)
     });
   }
-  console.log("SUPABASE_JWT_SECRET", SUPABASE_JWT_SECRET);
 
-
-  console.log("token", userPassword);
   return new Response(JSON.stringify({ auth_id: authUserId, token: userPassword, email: `${telegramId}@${MAIL_DOMAIN}` }), {
     status: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
