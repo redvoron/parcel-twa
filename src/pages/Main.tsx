@@ -36,7 +36,7 @@ const MainPage = () => {
         ))}
       </List>
       <Button onClick={handleAuth} loading={loading}>Auth User</Button>
-      {authResponse && <div>{authResponse.message}</div>}
+      {authResponse && <div>{JSON.stringify(authResponse)}</div>}
     </div>
   );
 };
