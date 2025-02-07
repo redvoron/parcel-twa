@@ -42,6 +42,7 @@ export const authenticateUser = async (
   }
 
   try {
+    console.log("try to fetch", import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-auth`,
       {
@@ -53,6 +54,7 @@ export const authenticateUser = async (
         body: JSON.stringify({ initData }),
       }
     );
+    console.log("response", response);
     if (!response.ok) {
       return {
         result: AuthResultType.ERROR,
@@ -62,7 +64,7 @@ export const authenticateUser = async (
     }
 
     const responseData = await response.json();
-    
+    console.log("responseData", responseData);
     const { auth_id, token, email } = responseData;
     
     if (!auth_id || !token || !email) {
