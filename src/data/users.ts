@@ -8,7 +8,7 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
     .update({ meta })
     .eq("id", userId);
   if (error) {
-    return error;
+    throw error;
   }
   return data;
 };
