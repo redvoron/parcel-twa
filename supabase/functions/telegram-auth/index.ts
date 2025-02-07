@@ -7,8 +7,9 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const SUPABASE_JWT_SECRET = Deno.env.get("PROJECT_JWT_SECRET")!;
-const MAIL_DOMAIN = 'parcel.app.user';
-const APP_DOMAIN = 'redvoron.github.io';
+
+const MAIL_DOMAIN = Deno.env.get("MAIL_DOMAIN") || 'parcel.app.user';
+const APP_DOMAIN = Deno.env.get("APP_DOMAIN") || 'redvoron.github.io';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
