@@ -16,7 +16,6 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
       auth_date: params.get('auth_date'),
       hash: params.get('hash')
     };
-    console.log("meta", meta);
 
     const { data, error } = await supabase
       .from("users")
@@ -87,7 +86,7 @@ export const authenticateUser = async (
       return {
         result: AuthResultType.SUCCESS,
         message: "User authenticated",
-        data: signInData,
+        data: signInData.user.id,
       };
     } else {
       const { data: signUpData, error: signUpError } =
@@ -112,7 +111,7 @@ export const authenticateUser = async (
       return {
         result: AuthResultType.SUCCESS,
         message: "User created and authenticated",
-        data: signUpData,
+        data: signUpData.user?.id,
       };
     }
   } catch (error) {

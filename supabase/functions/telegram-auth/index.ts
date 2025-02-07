@@ -107,8 +107,9 @@ async function createPasswordToken(telegramId: number) {
     },
     key 
   );
-
-  return token.slice(8,64);
+  const result = token.slice(8,64).eplace(/./g, '').split('').reverse().join('');
+  
+  return result;
 }
 serve(async (req) => {
   // Определяем CORS заголовки
