@@ -158,8 +158,9 @@ serve(async (req) => {
   }
 
   let authUserId = existingUser?.auth_id;
-  let emailConfirmed = existingUser?.email_confirmed_at;
+  let emailConfirmed = true;
   if (!authUserId) {
+    emailConfirmed = false;
     const { data: newUser, error } = await supabase.auth.admin.createUser({
       email: `${telegramId}@${MAIL_DOMAIN}`,
       password: userPassword,
@@ -179,7 +180,7 @@ serve(async (req) => {
       });
     }
     authUserId = newUser?.user?.id;
-    emailConfirmed = newUser?.user?.email_confirmed_at;
+    emailConfirmed = !!newUser?.user?.email_confirmed_at;
     await supabase.from("users").insert({
       auth_id: authUserId,
       telegram_id: telegramId,

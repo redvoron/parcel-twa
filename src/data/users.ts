@@ -46,6 +46,7 @@ export const authenticateUser = async (
     }
 
     const { auth_id, token, email, email_confirmed } = await response.json();
+    console.log(auth_id, token, email, email_confirmed);
     // Пытаемся войти сначала, если email подтвержден
     if (email_confirmed) {
       const { data: signInData, error: signInError } =
