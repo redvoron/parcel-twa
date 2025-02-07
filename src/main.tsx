@@ -1,10 +1,11 @@
 import './i18n';
-import React, { createContext } from 'react'
-import { ConfigProvider } from 'antd';
+import React, { createContext, useEffect, useState } from 'react'
+import { ConfigProvider, Flex, Spin } from 'antd';
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import WebApp from '@twa-dev/sdk'
+import { LoadingOutlined } from "@ant-design/icons";
 import { authenticateUser } from './data/users.ts';
 
 const userContext = await authenticateUser(WebApp.initData);
@@ -23,14 +24,44 @@ const telegramTheme = {
   },
 };
 
-WebApp.ready();
+function Root() {
+  const [context, setContext] = useState(globalContext);
+  const [isLoading, setIsLoading] = useState(true);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <GlobalContext.Provider value={globalContext}>
+  useEffect(() => {
+    const initApp = async () => {
+      try {
+        const userContext = await authenticateUser(WebApp.initData);
+        setContext({webApp: WebApp, userContext});
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initApp();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Flex align="center" justify="center" style={{ height: "100vh" }}>
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 72 }} spin />} />
+      </Flex>
+    );
+  }
+
+  return (
+    <GlobalContext.Provider value={context}>
       <ConfigProvider theme={telegramTheme}>
         <App />
       </ConfigProvider>
     </GlobalContext.Provider>
+  );
+}
+
+WebApp.ready();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Root />
   </React.StrictMode>,
 )
