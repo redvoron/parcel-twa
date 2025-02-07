@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.204.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import hmac_sha256 from "https://deno.land/x/hmacsha256/hmac-sha256-deno.mjs";
 import * as jwt from "https://deno.land/x/djwt@v2.9.1/mod.ts";
@@ -106,14 +105,19 @@ async function createPasswordToken(telegramId: number) {
       username: `user_${telegramId}`,
       provider: "telegram",
     },
-    key 
+    key
   );
-  const result = token.slice(21,72).replace(".", '').split('').reverse().join('');
-  
+  const result = token
+    .slice(21, 72)
+    .replace(".", "")
+    .split("")
+    .reverse()
+    .join("");
+
   return result;
 }
-serve(async (req) => {
-  // Определяем CORS заголовки
+
+Deno.serve(async (req) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": `https://${APP_DOMAIN}`,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -149,7 +153,6 @@ serve(async (req) => {
     .select("auth_id")
     .eq("telegram_id", telegramId)
     .maybeSingle();
-
   if (userError) {
     return new Response(JSON.stringify({ error: userError.message }), {
       status: 500,
@@ -158,9 +161,7 @@ serve(async (req) => {
   }
 
   let authUserId = existingUser?.auth_id;
-  let emailConfirmed = true;
   if (!authUserId) {
-    emailConfirmed = false;
     const { data: newUser, error } = await supabase.auth.admin.createUser({
       email: `${telegramId}@${MAIL_DOMAIN}`,
       password: userPassword,
@@ -180,7 +181,6 @@ serve(async (req) => {
       });
     }
     authUserId = newUser?.user?.id;
-    emailConfirmed = !!newUser?.user?.email_confirmed_at;
     await supabase.from("users").insert({
       auth_id: authUserId,
       telegram_id: telegramId,
@@ -191,8 +191,15 @@ serve(async (req) => {
     });
   }
 
-  return new Response(JSON.stringify({ auth_id: authUserId, token: userPassword, email: `${telegramId}@${MAIL_DOMAIN}`, email_confirmed: emailConfirmed }), {
-    status: 200,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({
+      auth_id: authUserId,
+      token: userPassword,
+      email: `${telegramId}@${MAIL_DOMAIN}`,
+    }),
+    {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    }
+  );
 });
