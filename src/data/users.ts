@@ -68,7 +68,7 @@ export const authenticateUser = async (
         message: "User authenticated",
         data: signInData,
       };
-    }
+    } else {
 
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
       {
@@ -90,12 +90,13 @@ export const authenticateUser = async (
       };
     }
     signUpData?.user?.id && await updateUserMeta(signUpData.user.id, initData);
-    
+
     return {
       result: AuthResultType.SUCCESS,
       message: "User created and authenticated",
-      data: signUpData,
-    };
+        data: signUpData,
+      };
+    }
   } catch (error) {
     return {
       result: AuthResultType.ERROR,
