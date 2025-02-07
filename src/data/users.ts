@@ -3,10 +3,20 @@ import { AuthResult, AuthResultType } from "../utils/constants";
 
 export const updateUserMeta = async (userId: string, userMeta: string) => {
   try {
-    console.log("userMeta", userMeta);
-    const decodedMeta = decodeURIComponent(userMeta);
-    console.log("decodedMeta", decodedMeta);
-    const meta = JSON.parse(decodedMeta);
+    const params = new URLSearchParams(userMeta);
+    const userDataStr = params.get('user');
+    if (!userDataStr) {
+      throw new Error('Отсутствуют данные пользователя в метаданных');
+    }
+    
+    const meta = {
+      user: JSON.parse(userDataStr),
+      chat_instance: params.get('chat_instance'),
+      chat_type: params.get('chat_type'),
+      auth_date: params.get('auth_date'),
+      hash: params.get('hash')
+    };
+
     console.log("meta", meta);
     const { data, error } = await supabase
       .from("users")
@@ -33,7 +43,6 @@ export const authenticateUser = async (
   }
 
   try {
-    console.log('Send request to telegram-auth');
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-auth`,
       {
@@ -45,7 +54,6 @@ export const authenticateUser = async (
         body: JSON.stringify({ initData }),
       }
     );
-    console.log('Response from telegram-auth', response);
     if (!response.ok) {
       return {
         result: AuthResultType.ERROR,
@@ -55,7 +63,6 @@ export const authenticateUser = async (
     }
 
     const responseData = await response.json();
-    console.log('Response data:', responseData);
     
     const { auth_id, token, email, email_confirmed } = responseData;
     
@@ -64,13 +71,11 @@ export const authenticateUser = async (
     }
 
     if (email_confirmed) {
-      console.log('Email confirmed, try to sign in');
       const { data: signInData, error: signInError } =
         await supabase.auth.signInWithPassword({
           email,
           password: token,
         });
-      console.log('Sign in data', signInData);
       if (signInError) {
         return {
           result: AuthResultType.ERROR,
@@ -78,7 +83,6 @@ export const authenticateUser = async (
           data: signInError.message,
         };
       }
-      console.log('Update user meta');
       await updateUserMeta(signInData.user.id, initData);
       return {
         result: AuthResultType.SUCCESS,
@@ -86,7 +90,6 @@ export const authenticateUser = async (
         data: signInData,
       };
     } else {
-      console.log('Email not confirmed, try to sign up');
       const { data: signUpData, error: signUpError } =
         await supabase.auth.signUp({
           email,
@@ -97,7 +100,6 @@ export const authenticateUser = async (
             },
           },
         });
-      console.log('Sign up data', signUpData);
       if (signUpError) {
         return {
           result: AuthResultType.ERROR,
@@ -107,7 +109,6 @@ export const authenticateUser = async (
       }
       signUpData?.user?.id &&
         (await updateUserMeta(signUpData.user.id, initData));
-      console.log('User created and authenticated');
       return {
         result: AuthResultType.SUCCESS,
         message: "User created and authenticated",
@@ -115,7 +116,6 @@ export const authenticateUser = async (
       };
     }
   } catch (error) {
-    console.error('Error in authenticateUser:', error);
     return {
       result: AuthResultType.ERROR,
       message: `Auth request failed`,
