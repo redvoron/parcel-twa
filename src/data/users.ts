@@ -10,7 +10,7 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
     .update({ meta })
     .eq("id", userId);
   if (error) {
-    throw error;
+    console.error("Error updating user meta:", error);
   }
   return data;
 };
@@ -48,7 +48,15 @@ export const authenticateUser = async (
       };
     }
 
-    const { auth_id, token, email, email_confirmed } = await response.json();
+    const responseData = await response.json();
+    console.log('Response data:', responseData);
+    
+    const { auth_id, token, email, email_confirmed } = responseData;
+    
+    if (!auth_id || !token || !email) {
+      throw new Error('Missing required fields in response');
+    }
+
     if (email_confirmed) {
       console.log('Email confirmed, try to sign in');
       const { data: signInData, error: signInError } =
@@ -101,6 +109,7 @@ export const authenticateUser = async (
       };
     }
   } catch (error) {
+    console.error('Error in authenticateUser:', error);
     return {
       result: AuthResultType.ERROR,
       message: `Auth request failed`,
