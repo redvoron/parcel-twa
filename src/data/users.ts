@@ -6,7 +6,7 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
     const params = new URLSearchParams(userMeta);
     const userDataStr = params.get('user');
     if (!userDataStr) {
-      throw new Error('Отсутствуют данные пользователя в метаданных');
+      throw new Error('No user data found in meta');
     }
     
     const meta = {
@@ -78,7 +78,7 @@ export const authenticateUser = async (
       if (signInError) {
         return {
           result: AuthResultType.ERROR,
-          message: "Ошибка аутентификации Supabase",
+          message: "Supabase authentication error",
           data: signInError.message,
         };
       }
