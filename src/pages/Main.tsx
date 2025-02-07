@@ -2,27 +2,14 @@ import { useTranslation } from "react-i18next";
 import { routes } from "../utils/routes";
 import { Button, List } from "antd";
 import { useNavigate } from "react-router-dom";
-import { authenticateUser } from "../data/users";
-import WebApp from "@twa-dev/sdk";
-import { useState } from "react";
-import { AuthResult } from "../utils/constants";
 
 const MainPage = () => {
   const { t } = useTranslation();
-  const [authResponse, setAuthResponse] = useState<AuthResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleCellClick = (path: string) => {
     navigate(path);
   };
-  const userData: string = WebApp.initData;
-  const handleAuth = async () => {
-    setAuthResponse(null);
-    setLoading(true);
-    const response = await authenticateUser(userData);
-    setAuthResponse(response);
-    setLoading(false);
-  };
+
   return (
     <div className="page">
       <h2>{t("welcome")}</h2>
@@ -35,8 +22,6 @@ const MainPage = () => {
           </List.Item>
         ))}
       </List>
-      <Button onClick={handleAuth} loading={loading}>Auth User</Button>
-      {authResponse && <div>{JSON.stringify(authResponse)}</div>}
     </div>
   );
 };
