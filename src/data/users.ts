@@ -3,6 +3,7 @@ import { AuthResult, AuthResultType } from "../utils/constants";
 
 export const updateUserMeta = async (userId: string, userMeta: string) => {
   const meta = JSON.parse(userMeta);
+  console.log({meta});
   const { data, error } = await supabase
     .from("users")
     .update({ meta })
@@ -46,8 +47,6 @@ export const authenticateUser = async (
     }
 
     const { auth_id, token, email, email_confirmed } = await response.json();
-    console.log(auth_id, token, email, email_confirmed);
-    // Пытаемся войти сначала, если email подтвержден
     if (email_confirmed) {
       const { data: signInData, error: signInError } =
         await supabase.auth.signInWithPassword({
