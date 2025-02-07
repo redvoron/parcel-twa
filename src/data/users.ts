@@ -3,7 +3,7 @@ import { AuthResult, AuthResultType } from "../utils/constants";
 
 export const updateUserMeta = async (userId: string, userMeta: string) => {
   const meta = JSON.parse(userMeta);
-  console.log({meta});
+  console.log('meta', meta);
   const { data, error } = await supabase
     .from("users")
     .update({ meta })
