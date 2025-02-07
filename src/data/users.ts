@@ -63,57 +63,51 @@ export const authenticateUser = async (
 
     const responseData = await response.json();
     
-    const { auth_id, token, email, email_confirmed } = responseData;
+    const { auth_id, token, email } = responseData;
     
     if (!auth_id || !token || !email) {
       throw new Error('Missing required fields in response');
     }
 
-    if (email_confirmed) {
-      const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password: token,
-        });
-      if (signInError) {
-        return {
-          result: AuthResultType.ERROR,
-          message: "Supabase authentication error",
-          data: signInError.message,
-        };
-      }
-      await updateUserMeta(signInData.user.id, initData);
-      return {
-        result: AuthResultType.SUCCESS,
-        message: "User authenticated",
-        data: signInData.user.id,
-      };
-    } else {
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email,
-          password: token,
-          options: {
-            data: {
-              auth_id,
-            },
+    const { error: signUpError } =
+      await supabase.auth.signUp({
+        email,
+        password: token,
+        options: {
+          data: {
+            auth_id,
           },
-        });
-      if (signUpError) {
-        return {
-          result: AuthResultType.ERROR,
-          message: "User registration error",
-          data: signUpError.message,
-        };
-      }
-      signUpData?.user?.id &&
-        (await updateUserMeta(signUpData.user.id, initData));
+        },
+      });
+
+    if (signUpError && !signUpError.message.includes('User already registered')) {
       return {
-        result: AuthResultType.SUCCESS,
-        message: "User created and authenticated",
-        data: signUpData.user?.id,
+        result: AuthResultType.ERROR,
+        message: "User registration error",
+        data: signUpError.message,
       };
     }
+
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password: token,
+      });
+
+    if (signInError) {
+      return {
+        result: AuthResultType.ERROR,
+        message: "Authentication error",
+        data: signInError.message,
+      };
+    }
+
+    await updateUserMeta(signInData.user.id, initData);
+    return {
+      result: AuthResultType.SUCCESS,
+      message: signUpError ? "User authenticated" : "User created and authenticated",
+      data: signInData.user.id,
+    };
   } catch (error) {
     return {
       result: AuthResultType.ERROR,
