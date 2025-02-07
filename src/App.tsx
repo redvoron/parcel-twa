@@ -10,7 +10,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 const isDev = import.meta.env.MODE === "development";
 function App() {
   const { webApp, userContext } = useContext(GlobalContext);
-  console.log("at app page", webApp, userContext);
+  console.log("AppPageContext", webApp, userContext);
   const { result, data } = userContext;
   const userAuthId = (result === AuthResultType.SUCCESS ? data : null) || isDev;
   if (!userAuthId) {
