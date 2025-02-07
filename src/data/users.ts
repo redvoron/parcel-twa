@@ -7,7 +7,7 @@ export const updateUserMeta = async (userId: string, userMeta: string) => {
   const meta = JSON.parse(userMeta);
   const { data, error } = await supabase.from("users").update({ meta }).eq("id", userId);
   if (error) {
-    throw error;
+    return error;
   }
   return data;
 };
@@ -52,7 +52,6 @@ export const authenticateUser = async (initData: string): Promise<AuthResult> =>
     });
 
     if (signUpError) {
-      // Если пользователь уже существует, пробуем войти
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password: token,
@@ -65,7 +64,7 @@ export const authenticateUser = async (initData: string): Promise<AuthResult> =>
           data: signInError.message
         };
       }
-      
+
       await updateUserMeta(signInData.user.id, initData);
       return {
         result: AuthResultType.SUCCESS,
