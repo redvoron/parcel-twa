@@ -68,7 +68,7 @@ export const authenticateUser = async (
     if (!auth_id || !token || !email) {
       throw new Error('Missing required fields in response');
     }
-
+    console.log("try to sign up", responseData);
     const { error: signUpError } =
       await supabase.auth.signUp({
         email,
@@ -79,7 +79,7 @@ export const authenticateUser = async (
           },
         },
       });
-
+    console.log("signUpError", signUpError);
     if (signUpError && !signUpError.message.includes('User already registered')) {
       return {
         result: AuthResultType.ERROR,
@@ -87,13 +87,13 @@ export const authenticateUser = async (
         data: signUpError.message,
       };
     }
-
+    console.log("try to sign in");
     const { data: signInData, error: signInError } =
       await supabase.auth.signInWithPassword({
         email,
         password: token,
       });
-
+    console.log("signInError", signInError);
     if (signInError) {
       return {
         result: AuthResultType.ERROR,
@@ -101,7 +101,7 @@ export const authenticateUser = async (
         data: signInError.message,
       };
     }
-
+    console.log("try to update user meta", signInData.user.id, initData);
     await updateUserMeta(signInData.user.id, initData);
     return {
       result: AuthResultType.SUCCESS,
