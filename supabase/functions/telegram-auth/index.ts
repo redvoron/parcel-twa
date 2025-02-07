@@ -107,7 +107,7 @@ async function createPasswordToken(telegramId: number) {
     },
     key 
   );
-  const result = token.slice(8,64).replace(/./g, '').split('').reverse().join('');
+  const result = token.slice(21,72).replace(".", '').split('').reverse().join('');
   
   return result;
 }
