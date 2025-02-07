@@ -187,7 +187,6 @@ serve(async (req) => {
       first_name: firstName,
       last_name: lastName,
       avatar_url: avatarUrl,
-      meta: JSON.parse(initData)
     });
   }
 
