@@ -75,6 +75,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       dataIndex: "created_at",
       key: "created_at",
       hidden: !visibleColumns.includes(OrdersTableColumns.CREATED_AT),
+      responsive: ["md"],
       render: (text: string) => {
         return new Date(text).toLocaleString();
       },

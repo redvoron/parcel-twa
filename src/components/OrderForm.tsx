@@ -145,7 +145,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         >
           <Form.Item
             name="from_city"
-            label="Город отправления"
+            label="Откуда"
             rules={[{ required: true, message: "Выберите город отправления" }]}
           >
             <Select
@@ -184,7 +184,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
 
           <Form.Item
             name="to_city"
-            label="Город назначения"
+            label="Куда"
             rules={[{ required: true, message: "Выберите город назначения" }]}
           >
             <Select
@@ -224,64 +224,85 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
           <Form.Item
             name="from_date"
-            label="Дата отправления"
+            label="Отправление"
             rules={[{ required: true, message: "Выберите дату отправления" }]}
           >
-            <DatePicker style={{ width: "100%" }} minDate={today} onChange={(value) => {
+            <DatePicker inputReadOnly={true} style={{ width: "100%" }} minDate={today} onChange={(value) => {
               form.setFieldsValue({ from_date: value });
             }}/>
           </Form.Item>
 
           <Form.Item
             name="to_date"
-            label="Дата прибытия"
+            label="Прибытие"
             rules={[{ required: true, message: "Выберите дату прибытия" }]}
           >
-            <DatePicker style={{ width: "100%" }} minDate={today} onChange={(value) => {
+            <DatePicker inputReadOnly={true} style={{ width: "100%" }} minDate={today} onChange={(value) => {
               form.setFieldsValue({ to_date: value });
             }}/>
           </Form.Item>
           </div>
-          <div>
-          <Form.Item
-            name="weight"
-            label="Вес (кг)"
-            rules={[{ required: true, message: "Укажите вес" }]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
-        </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "16px",
-          }}
-        >
-          <Form.Item
-            name="width"
-            label="Ширина (см)"
-            rules={[{ required: true, message: "Укажите ширину" }]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
+        <div style={{ display: "table", width: "100%" }}>
+          <div style={{ display: "table-row" }}>
+            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+              <label htmlFor="weight">Вес</label>
+            </div>
+            <div style={{ display: "table-cell" }}>
+              <Form.Item
+                name="weight"
+                rules={[{ required: true, message: "Укажите вес" }]}
+                style={{ marginBottom: "16px" }}
+              >
+                <InputNumber id="weight" min={0} style={{ width: "100%" }} addonAfter="кг"/>
+              </Form.Item>
+            </div>
+          </div>
 
-          <Form.Item
-            name="height"
-            label="Высота (см)"
-            rules={[{ required: true, message: "Укажите высоту" }]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
+          <div style={{ display: "table-row" }}>
+            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+              <label htmlFor="width">Ширина</label>
+            </div>
+            <div style={{ display: "table-cell" }}>
+              <Form.Item
+                name="width"
+                rules={[{ required: true, message: "Укажите ширину" }]}
+                style={{ marginBottom: "16px" }}
+              >
+                <InputNumber id="width" min={0} style={{ width: "100%" }} addonAfter="см"/>
+              </Form.Item>
+            </div>
+          </div>
 
-          <Form.Item
-            name="length"
-            label="Длина (см)"
-            rules={[{ required: true, message: "Укажите длину" }]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
+          <div style={{ display: "table-row" }}>
+            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+              <label htmlFor="height">Высота</label>
+            </div>
+            <div style={{ display: "table-cell" }}>
+              <Form.Item
+                name="height"
+                rules={[{ required: true, message: "Укажите высоту" }]}
+                style={{ marginBottom: "16px" }}
+              >
+                <InputNumber id="height" min={0} style={{ width: "100%" }} addonAfter="см"/>
+              </Form.Item>
+            </div>
+          </div>
+
+          <div style={{ display: "table-row" }}>
+            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+              <label htmlFor="length">Длина</label>
+            </div>
+            <div style={{ display: "table-cell" }}>
+              <Form.Item
+                name="length"
+                rules={[{ required: true, message: "Укажите длину" }]}
+                style={{ marginBottom: "16px" }}
+              >
+                <InputNumber id="length" min={0} style={{ width: "100%" }} addonAfter="см"/>
+              </Form.Item>
+            </div>
+          </div>
         </div>
 
         <Form.Item
