@@ -1,7 +1,7 @@
 import WebApp from "@twa-dev/sdk";
 
 export enum OrdersStatus {
-  PENDING = "pending",
+  CREATED = "created",
   COMPLETED = "completed",
   CANCELLED = "cancelled",
   DELIVERED = "delivered",
@@ -20,10 +20,25 @@ export enum UserActions {
   DELETE = "delete",
 }
 
+export enum OrdersViewType {
+  DELIVERY = "delivery",
+  PICKUP = "pickup",
+  MY = "my",
+  USER = "user",
+}
+
+export enum OrdersTableColumns {
+  TYPE = "type",
+  STATUS = "status",
+  ACTION = "action",
+  CREATED_AT = "created_at",
+  UPDATED_AT = "updated_at",
+}
+
 export type AuthResult = {
   result: AuthResultType;
   message: string;
-  data: unknown;
+  data: string;
 }
 
 export enum AuthResultType {
@@ -31,7 +46,16 @@ export enum AuthResultType {
   ERROR = "error",
 }
 
+export enum FormModes {
+  CREATE = "create",
+  EDIT = "edit",
+}
 export interface GlobalContextType {
   webApp: typeof WebApp;
   userContext: AuthResult | null;
+}
+
+export enum Lang {
+  RU = "ru",
+  EN = "en",
 }

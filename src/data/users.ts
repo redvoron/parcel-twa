@@ -37,7 +37,7 @@ export const authenticateUser = async (
     return {
       result: AuthResultType.ERROR,
       message: "No Telegram init data found",
-      data: null,
+      data: "",
     };
   }
 
@@ -110,7 +110,7 @@ export const authenticateUser = async (
     return {
       result: AuthResultType.ERROR,
       message: `Auth request failed`,
-      data: error,
+      data: JSON.stringify(error),
     };
   }
 };

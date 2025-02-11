@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 const MainPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  
   const handleCellClick = (path: string) => {
     navigate(path);
   };

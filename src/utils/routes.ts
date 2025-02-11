@@ -1,6 +1,6 @@
 import SendPage from "../pages/Send";
 import OrdersPage from "../pages/Orders";
-import MyOrdersPage from "../pages/MyOrders";
+import MyOrdersPage from "../pages/OrdersMy";
 import DeliverPage from "../pages/Deliver";
 import ChatPage from "../pages/Chat";
 
