@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   Button,
-  Card,
   Typography,
   DatePicker,
   InputNumber,
@@ -20,9 +19,9 @@ const { TextArea } = Input;
 
 const today = dayjs();
 interface OrderFormProps {
-  type?: OrdersTypes,
-  mode: FormModes,
-  orderId?: number
+  type?: OrdersTypes;
+  mode: FormModes;
+  orderId?: number;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
@@ -34,7 +33,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [orderLoading, setOrderLoading] = React.useState<boolean>(false);
   const { userContext } = useContext(GlobalContext);
-  
+
   const onFinish = async (values: OrderData) => {
     setOrderLoading(true);
     const formattedValues: OrderData = {
@@ -52,7 +51,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
 
     const prepOrderData: OrderData = {
-      ...formattedValues
+      ...formattedValues,
     };
     prepOrderData.from_city = fromCity;
     prepOrderData.to_city = toCity;
@@ -93,7 +92,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     if (values.to_city) {
       const cityName = await ordersApi.getCityName(values.to_city, lang);
       form.setFieldsValue({
-      to_city: cityName.city_name,
+        to_city: cityName.city_name,
       });
       setToCity(values.to_city);
     }
@@ -109,18 +108,18 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
       ready_to_receive: values.ready_to_receive,
       description: values.description,
     });
-  }
+  };
   const getOrder = async () => {
     if (orderId) {
-      const order = await ordersApi.getOrders({orderId: orderId});
+      const order = await ordersApi.getOrders({ orderId: orderId });
       //TODO check if can be edited
       const orderData = order?.data[0]?.data;
       if (orderData) {
         setFieldsValue(orderData);
       }
     }
-  }
-  
+  };
+
   useEffect(() => {
     if (mode === FormModes.EDIT && orderId) {
       getOrder();
@@ -128,7 +127,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   }, [mode, orderId]);
 
   return (
-    <Card style={{ maxWidth: 800, margin: "24px auto" }}>
+    <div>
       <Title level={2}>Создать заказ</Title>
       <Form
         form={form}
@@ -220,16 +219,27 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               placeholder="Выберите город"
             />
           </Form.Item>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "16px",
+          }}
+        >
           <Form.Item
             name="from_date"
             label="Отправление"
             rules={[{ required: true, message: "Выберите дату отправления" }]}
           >
-            <DatePicker inputReadOnly={true} style={{ width: "100%" }} minDate={today} onChange={(value) => {
-              form.setFieldsValue({ from_date: value });
-            }}/>
+            <DatePicker
+              inputReadOnly={true}
+              style={{ width: "100%" }}
+              minDate={today}
+              onChange={(value) => {
+                form.setFieldsValue({ from_date: value });
+              }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -237,15 +247,26 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             label="Прибытие"
             rules={[{ required: true, message: "Выберите дату прибытия" }]}
           >
-            <DatePicker inputReadOnly={true} style={{ width: "100%" }} minDate={today} onChange={(value) => {
-              form.setFieldsValue({ to_date: value });
-            }}/>
+            <DatePicker
+              inputReadOnly={true}
+              style={{ width: "100%" }}
+              minDate={today}
+              onChange={(value) => {
+                form.setFieldsValue({ to_date: value });
+              }}
+            />
           </Form.Item>
-          </div>
+        </div>
 
         <div style={{ display: "table", width: "100%" }}>
           <div style={{ display: "table-row" }}>
-            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+            <div
+              style={{
+                display: "table-cell",
+                padding: "8px 16px 8px 0",
+                textAlign: "left",
+              }}
+            >
               <label htmlFor="weight">Вес</label>
             </div>
             <div style={{ display: "table-cell" }}>
@@ -254,13 +275,24 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 rules={[{ required: true, message: "Укажите вес" }]}
                 style={{ marginBottom: "16px" }}
               >
-                <InputNumber id="weight" min={0} style={{ width: "100%" }} addonAfter="кг"/>
+                <InputNumber
+                  id="weight"
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonAfter="кг"
+                />
               </Form.Item>
             </div>
           </div>
 
           <div style={{ display: "table-row" }}>
-            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+            <div
+              style={{
+                display: "table-cell",
+                padding: "8px 16px 8px 0",
+                textAlign: "left",
+              }}
+            >
               <label htmlFor="width">Ширина</label>
             </div>
             <div style={{ display: "table-cell" }}>
@@ -269,13 +301,24 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 rules={[{ required: true, message: "Укажите ширину" }]}
                 style={{ marginBottom: "16px" }}
               >
-                <InputNumber id="width" min={0} style={{ width: "100%" }} addonAfter="см"/>
+                <InputNumber
+                  id="width"
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonAfter="см"
+                />
               </Form.Item>
             </div>
           </div>
 
           <div style={{ display: "table-row" }}>
-            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+            <div
+              style={{
+                display: "table-cell",
+                padding: "8px 16px 8px 0",
+                textAlign: "left",
+              }}
+            >
               <label htmlFor="height">Высота</label>
             </div>
             <div style={{ display: "table-cell" }}>
@@ -284,13 +327,24 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 rules={[{ required: true, message: "Укажите высоту" }]}
                 style={{ marginBottom: "16px" }}
               >
-                <InputNumber id="height" min={0} style={{ width: "100%" }} addonAfter="см"/>
+                <InputNumber
+                  id="height"
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonAfter="см"
+                />
               </Form.Item>
             </div>
           </div>
 
           <div style={{ display: "table-row" }}>
-            <div style={{ display: "table-cell", padding: "8px 16px 8px 0", textAlign: "left" }}>
+            <div
+              style={{
+                display: "table-cell",
+                padding: "8px 16px 8px 0",
+                textAlign: "left",
+              }}
+            >
               <label htmlFor="length">Длина</label>
             </div>
             <div style={{ display: "table-cell" }}>
@@ -299,7 +353,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 rules={[{ required: true, message: "Укажите длину" }]}
                 style={{ marginBottom: "16px" }}
               >
-                <InputNumber id="length" min={0} style={{ width: "100%" }} addonAfter="см"/>
+                <InputNumber
+                  id="length"
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonAfter="см"
+                />
               </Form.Item>
             </div>
           </div>
@@ -314,12 +373,19 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block loading={orderLoading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            loading={orderLoading}
+            size="large"
+            disabled={orderLoading}
+          >
             {mode === FormModes.CREATE ? "Создать заказ" : "Обновить заказ"}
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    </div>
   );
 };
 
