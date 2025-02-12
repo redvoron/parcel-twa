@@ -13,6 +13,7 @@ const OrdersPage = () => {
       <h1>{t("orders")}</h1>
       <OrdersTable viewType={OrdersViewType.USER} />
       <OrderForm mode={FormModes.CREATE} type={OrdersTypes.DELIVERY} />
+      <OrderForm mode={FormModes.EDIT} orderId={6}/>
     </div>
   );
 };

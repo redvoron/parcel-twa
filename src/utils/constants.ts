@@ -41,6 +41,10 @@ export type AuthResult = {
   data: string;
 }
 
+export type UserContext = AuthResult & {
+  lang: Lang;
+}
+
 export enum AuthResultType {
   SUCCESS = "success",
   ERROR = "error",
@@ -52,7 +56,7 @@ export enum FormModes {
 }
 export interface GlobalContextType {
   webApp: typeof WebApp;
-  userContext: AuthResult | null;
+  userContext: UserContext | null;
 }
 
 export enum Lang {

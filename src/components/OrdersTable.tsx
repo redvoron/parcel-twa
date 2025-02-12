@@ -133,7 +133,6 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   const getData = async () => {
     setLoading(true);
     const data = await ordersApi.getOrders(getOrdersTableParams);
-    console.log(data);
     setData(data.data);
     setOrdersTypes(data.ordersTypes);
     setOrdersStatuses(data.ordersStatuses);

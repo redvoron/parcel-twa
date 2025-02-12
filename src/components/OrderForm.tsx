@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import {
   Form,
   Input,
@@ -7,6 +7,8 @@ import {
   DatePicker,
   InputNumber,
   Select,
+  Checkbox,
+  Popconfirm,
 } from "antd";
 import { ordersApi } from "../data/orders";
 import type { OrderData, CitySearchResult } from "../data/orders";
@@ -14,6 +16,7 @@ import dayjs from "dayjs";
 import Flag from "react-world-flags";
 import { FormModes, Lang, OrdersTypes } from "../utils/constants";
 import { GlobalContext } from "../main";
+import { useTranslation } from "react-i18next";
 const { Title } = Typography;
 const { TextArea } = Input;
 
@@ -33,6 +36,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [orderLoading, setOrderLoading] = React.useState<boolean>(false);
   const { userContext } = useContext(GlobalContext);
+  const [orderType, setOrderType] = React.useState<OrdersTypes>(type || OrdersTypes.DELIVERY);
+  const { t } = useTranslation();
 
   const onFinish = async (values: OrderData) => {
     setOrderLoading(true);
@@ -46,7 +51,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         : undefined,
     };
 
-    console.log("Отправка данных:", formattedValues);
     //TODO: remove this
     const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
 
@@ -57,13 +61,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     prepOrderData.to_city = toCity;
 
     if (mode === FormModes.CREATE) {
-      // Здесь будет вызов API для создания заказа
       if (userId && type) {
         const order = await ordersApi.createOrder(userId, type, prepOrderData);
         console.log("Заказ создан:", order);
       }
     } else {
-      // Здесь будет вызов API для обновления заказа
       if (orderId) {
         const order = await ordersApi.updateOrder(orderId, prepOrderData);
         console.log("Заказ обновлен:", order);
@@ -79,9 +81,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     setLoading(false);
   };
 
+  const handleCancel = () => {
+    console.log("Cancel");
+  };
+
   const setFieldsValue = async (values: OrderData) => {
-    // Get lang from user context
-    const lang = Lang.RU;
+    const lang =  userContext?.lang || Lang.EN;
     if (values.from_city) {
       const cityName = await ordersApi.getCityName(values.from_city, lang);
       form.setFieldsValue({
@@ -114,11 +119,24 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
       const order = await ordersApi.getOrders({ orderId: orderId });
       //TODO check if can be edited
       const orderData = order?.data[0]?.data;
+      setOrderType(order?.data[0]?.type);
       if (orderData) {
         setFieldsValue(orderData);
       }
     }
   };
+
+  const getTitle = useMemo(() => {
+    return t(`order-${orderType}`) + (mode === FormModes.CREATE ? "" : ` #${orderId}`);
+  }, [mode, orderId, t, orderType]);
+
+  const getButtonText = useMemo(() => {
+    return t(`${mode}-order-${orderType}`);
+  }, [mode, t, orderType]);
+
+  const getCancelButtonText = useMemo(() => {
+    return t(`cancel-order-${orderType}`);
+  }, [t, orderType]);
 
   useEffect(() => {
     if (mode === FormModes.EDIT && orderId) {
@@ -128,7 +146,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
 
   return (
     <div>
-      <Title level={2}>Создать заказ</Title>
+      <Title level={2}>{getTitle}</Title>
       <Form
         form={form}
         layout="vertical"
@@ -144,19 +162,21 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         >
           <Form.Item
             name="from_city"
-            label="Откуда"
-            rules={[{ required: true, message: "Выберите город отправления" }]}
+            label={t("from-city")}
+            rules={[{ required: true, message: t("from-city-error") }]}
+            style={{textAlign: "left" }}
           >
             <Select
               options={cities.map((city) => ({
                 key: city.id,
                 value: city.city_ru,
               }))}
+              size="large"
               showSearch
               filterOption={false}
               onSearch={handleSearch}
               id="from_city"
-              notFoundContent={!search || loading ? null : "Ничего не найдено"}
+              notFoundContent={!search || loading ? null : t("nothing-found")}
               onSelect={(_value, option) => {
                 setSearch("");
                 setCities([]);
@@ -177,14 +197,14 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   </div>
                 );
               }}
-              placeholder="Выберите город"
+              placeholder={t("from-city-placeholder")}
             />
           </Form.Item>
-
           <Form.Item
             name="to_city"
-            label="Куда"
-            rules={[{ required: true, message: "Выберите город назначения" }]}
+            label={t("to-city")}
+            rules={[{ required: true, message: t("to-city-error") }]}
+            style={{textAlign: "left" }}
           >
             <Select
               options={cities.map((city) => ({
@@ -195,12 +215,13 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               filterOption={false}
               id="to_city"
               onSearch={handleSearch}
-              notFoundContent={!search || loading ? null : "Ничего не найдено"}
+              notFoundContent={!search || loading ? null : t("nothing-found")}
               onSelect={(_value, option) => {
                 setSearch("");
                 setCities([]);
                 setToCity(option.key);
               }}
+              size="large"
               optionRender={(option) => {
                 return (
                   <div style={{ display: "flex", alignItems: "left", gap: 10 }}>
@@ -216,7 +237,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   </div>
                 );
               }}
-              placeholder="Выберите город"
+              placeholder={t("to-city-placeholder")}
             />
           </Form.Item>
         </div>
@@ -229,8 +250,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         >
           <Form.Item
             name="from_date"
-            label="Отправление"
-            rules={[{ required: true, message: "Выберите дату отправления" }]}
+            label={t("departure")}
+            rules={[{ required: true, message: t("from-date-error") }]}
           >
             <DatePicker
               inputReadOnly={true}
@@ -239,13 +260,15 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               onChange={(value) => {
                 form.setFieldsValue({ from_date: value });
               }}
+              placeholder={t("select-date")}
+              size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="to_date"
-            label="Прибытие"
-            rules={[{ required: true, message: "Выберите дату прибытия" }]}
+            label={t("arrival")}
+            rules={[{ required: true, message: t("to-date-error") }]}
           >
             <DatePicker
               inputReadOnly={true}
@@ -254,6 +277,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               onChange={(value) => {
                 form.setFieldsValue({ to_date: value });
               }}
+              placeholder={t("select-date")}    
+              size="large"
             />
           </Form.Item>
         </div>
@@ -263,16 +288,18 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             <div
               style={{
                 display: "table-cell",
-                padding: "8px 16px 8px 0",
+                paddingRight: "8px",
+                paddingTop: "8px",
                 textAlign: "left",
-              }}
+                verticalAlign: "top",
+              }}      
             >
-              <label htmlFor="weight">Вес</label>
+              <label htmlFor="weight">{t("weight")}</label>
             </div>
             <div style={{ display: "table-cell" }}>
               <Form.Item
                 name="weight"
-                rules={[{ required: true, message: "Укажите вес" }]}
+                rules={[{ required: true, message: t("weight-error") }]}
                 style={{ marginBottom: "16px" }}
               >
                 <InputNumber
@@ -280,6 +307,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   min={0}
                   style={{ width: "100%" }}
                   addonAfter="кг"
+                  placeholder={t("weight-placeholder")}
+                  size="large"
                 />
               </Form.Item>
             </div>
@@ -289,16 +318,18 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             <div
               style={{
                 display: "table-cell",
-                padding: "8px 16px 8px 0",
+                paddingRight: "8px",
+                paddingTop: "8px",
                 textAlign: "left",
+                verticalAlign: "top",
               }}
             >
-              <label htmlFor="width">Ширина</label>
+              <label htmlFor="width">{t("width")}</label>
             </div>
             <div style={{ display: "table-cell" }}>
               <Form.Item
                 name="width"
-                rules={[{ required: true, message: "Укажите ширину" }]}
+                rules={[{ required: true, message: t("width-error") }]}
                 style={{ marginBottom: "16px" }}
               >
                 <InputNumber
@@ -306,6 +337,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   min={0}
                   style={{ width: "100%" }}
                   addonAfter="см"
+                  placeholder={t("width-placeholder")}
+                  size="large"
                 />
               </Form.Item>
             </div>
@@ -315,16 +348,18 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             <div
               style={{
                 display: "table-cell",
-                padding: "8px 16px 8px 0",
+                paddingRight: "8px",
+                paddingTop: "8px",
                 textAlign: "left",
+                verticalAlign: "top",
               }}
             >
-              <label htmlFor="height">Высота</label>
+              <label htmlFor="height">{t("height")}</label>
             </div>
             <div style={{ display: "table-cell" }}>
               <Form.Item
                 name="height"
-                rules={[{ required: true, message: "Укажите высоту" }]}
+                rules={[{ required: true, message: t("height-error") }]}
                 style={{ marginBottom: "16px" }}
               >
                 <InputNumber
@@ -332,44 +367,59 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   min={0}
                   style={{ width: "100%" }}
                   addonAfter="см"
+                  placeholder={t("height-placeholder")}
+                  size="large"
                 />
               </Form.Item>
             </div>
           </div>
 
-          <div style={{ display: "table-row" }}>
+          <div style={{ display: "table-row"}}>
             <div
               style={{
                 display: "table-cell",
-                padding: "8px 16px 8px 0",
+                paddingRight: "8px",
+                paddingTop: "8px",
                 textAlign: "left",
+                verticalAlign: "top",
               }}
             >
-              <label htmlFor="length">Длина</label>
+              <label htmlFor="length">{t("length")}</label>
             </div>
-            <div style={{ display: "table-cell" }}>
+            <div style={{ display: "table-cell", }}>
               <Form.Item
                 name="length"
-                rules={[{ required: true, message: "Укажите длину" }]}
-                style={{ marginBottom: "16px" }}
+                rules={[{ required: true, message: t("length-error") }]}
+                style={{ marginBottom: "16px"}}
               >
                 <InputNumber
                   id="length"
                   min={0}
-                  style={{ width: "100%" }}
+                  style={{ width: "100%"}}
                   addonAfter="см"
+                  placeholder={t("length-placeholder")}
+                  size="large"
                 />
               </Form.Item>
             </div>
           </div>
         </div>
-
+        {type === OrdersTypes.DELIVERY && (
+            <Form.Item name="ready_to_send" style={{textAlign: "left" }}>
+              <Checkbox style={{fontSize: "14px" }}>{t("ready-to-send")}</Checkbox>
+            </Form.Item>
+          )}
+          {type === OrdersTypes.PICKUP && ( 
+            <Form.Item name="ready_to_receive" style={{textAlign: "left" }}>
+              <Checkbox style={{fontSize: "14px" }}>{t("ready-to-receive")}</Checkbox>
+            </Form.Item>
+          )}
         <Form.Item
           name="description"
-          label="Описание"
-          rules={[{ required: true, message: "Добавьте описание заказа" }]}
+          label={t("description")}
+          rules={[{ required: true, message: t("description-error") }]}
         >
-          <TextArea rows={4} placeholder="Опишите детали заказа" />
+          <TextArea rows={4} placeholder={t("description-placeholder")} size="large" />
         </Form.Item>
 
         <Form.Item>
@@ -381,8 +431,29 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             size="large"
             disabled={orderLoading}
           >
-            {mode === FormModes.CREATE ? "Создать заказ" : "Обновить заказ"}
+            {getButtonText}
           </Button>
+          {mode === FormModes.EDIT && (
+              <Popconfirm
+              title={t(`popup-title-cancel-order-${orderType}`)}
+              description={t(`popup-text-cancel-order-${orderType}`)}
+              okText={t("yes")}
+              cancelText={t("no")}
+              onConfirm={handleCancel}
+            >
+            <Button
+              type="primary"
+              color="danger"
+              variant="outlined"
+              size="large"
+              block
+              loading={orderLoading}  
+              style={{marginTop: "12px"}}
+            >
+              {getCancelButtonText}
+            </Button>
+            </Popconfirm>
+          )}
         </Form.Item>
       </Form>
     </div>
