@@ -1,12 +1,13 @@
 {
   "welcome": "Welcome",
-  "orders": "Orders",
-  "my-orders": "My Orders",
-  "deliver": "Deliver",
+  "orders": "Orders and services",
+  "orders-my": "My orders and services",
+  "orders-delivery": "Delivery orders",
+  "orders-pickup": "Transportation services",
+  "orders-user": "User orders",
   "chat": "Chat",
-  "send": "Send",
-  "departure": "Departure",
   "arrival": "Arrival",
+  "departure": "Departure",
   "from-city-placeholder": "Select departure city",
   "to-city-placeholder": "Select destination city",
   "select-date": "Select date",
@@ -38,5 +39,13 @@
   "width-placeholder": "Package width",
   "height-placeholder": "Package height", 
   "length-placeholder": "Package length",
-  "description-placeholder": "Describe the details of the order"
+  "description-placeholder": "Describe the details of the order",
+  "yes": "Yes",
+  "no": "No",
+  "popup-title-cancel-order-delivery": "Cancel order",
+  "popup-title-cancel-order-pickup": "Cancel service",
+  "popup-text-cancel-order-delivery": "Are you sure you want to cancel the order?",
+  "popup-text-cancel-order-pickup": "Are you sure you want to cancel the service?",
+  "kg": "kg",
+  "cm": "cm"
 }

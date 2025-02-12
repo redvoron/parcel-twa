@@ -1,33 +1,38 @@
-import SendPage from "../pages/Send";
-import OrdersPage from "../pages/Orders";
-import MyOrdersPage from "../pages/OrdersMy";
-import DeliverPage from "../pages/Deliver";
-import ChatPage from "../pages/Chat";
-
-export const routes = [
-  {
-    path: '/send',
-    name: 'send',
-    component: SendPage,
-  },
-  {
+export const routes = {
+  orders: {
     path: '/orders',
     name: 'orders',
-    component: OrdersPage,
   },
-  {
-    path: '/my-orders',
-    name: 'my-orders',
-    component: MyOrdersPage,
+  myOrders: {
+    path: '/orders/my',
+    name: 'orders-my',
   },
-  {
+  orderEdit: {
+    path: '/orders/edit/:orderId',
+    name: 'orders-edit',
+  },
+  orderCreate: {
+    path: '/orders/create/:type',
+    name: 'orders-create',
+  },
+  deliveryOrders: {
+    path: '/orders/delivery',
+    name: 'orders-delivery',
+  },
+  pickupOrders: {
+    path: '/orders/pickup',
+    name: 'orders-pickup',
+  },
+  userOrders: {
+    path: '/orders/user/:userId',
+    name: 'orders-user',
+  },
+  deliver: {
     path: '/deliver',
     name: 'deliver',
-    component: DeliverPage,
   },
-  {
-    path: '/chat',
+  chat: {
+    path: '/chat/:chatId',
     name: 'chat',
-    component: ChatPage,
   },
-];
+};

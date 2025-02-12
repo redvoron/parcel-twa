@@ -1,10 +1,11 @@
 {
   "welcome": "Добро пожаловать",
   "orders": "Заявки и услуги",
-  "my-orders": "Мои заявки и услуги",
-  "deliver": "Доставка",
+  "orders-my": "Мои заявки и услуги",
+  "orders-delivery": "Заявки на доставку",
+  "orders-pickup": "Услуги перевозки",
+  "orders-user": "Заказы пользователя",
   "chat": "Чат",
-  "send": "Отправить",
   "departure": "Отправление",
   "arrival": "Прибытие",
   "from-city-placeholder": "Выберите город отправления",
@@ -44,5 +45,7 @@
   "popup-title-cancel-order-delivery": "Отмена заказа",
   "popup-title-cancel-order-pickup": "Отмена услуги",
   "popup-text-cancel-order-delivery": "Вы уверены, что хотите отменить заказ?",
-  "popup-text-cancel-order-pickup": "Вы уверены, что хотите отменить услугу?"
+  "popup-text-cancel-order-pickup": "Вы уверены, что хотите отменить услугу?",
+  "kg": "кг",
+  "cm": "см"
 }

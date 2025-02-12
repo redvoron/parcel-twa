@@ -2,18 +2,22 @@ import { useTranslation } from "react-i18next";
 
 import OrdersTable from "../components/OrdersTable";
 import { OrdersViewType } from "../utils/constants";
-import OrderForm from "../components/OrderForm";
-import { FormModes, OrdersTypes } from "../utils/constants";
+import { GetOrdersParams } from "../data/orders";
+import { useParams } from "react-router-dom";
 
-const OrdersPage = () => {
+interface OrdersPageProps {
+  type: OrdersViewType;
+  extraParams?: GetOrdersParams;
+}
+
+const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
   const { t } = useTranslation();
+  const { userId } = useParams();
 
   return (
     <div>
       <h1>{t("orders")}</h1>
-      <OrdersTable viewType={OrdersViewType.USER} />
-      <OrderForm mode={FormModes.CREATE} type={OrdersTypes.DELIVERY} />
-      <OrderForm mode={FormModes.EDIT} orderId={6}/>
+      <OrdersTable viewType={type} userId={userId} extraParams={extraParams} />
     </div>
   );
 };

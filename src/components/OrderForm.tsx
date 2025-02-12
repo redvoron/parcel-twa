@@ -9,6 +9,7 @@ import {
   Select,
   Checkbox,
   Popconfirm,
+  message,
 } from "antd";
 import { ordersApi } from "../data/orders";
 import type { OrderData, CitySearchResult } from "../data/orders";
@@ -36,7 +37,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [orderLoading, setOrderLoading] = React.useState<boolean>(false);
   const { userContext } = useContext(GlobalContext);
-  const [orderType, setOrderType] = React.useState<OrdersTypes>(type || OrdersTypes.DELIVERY);
+  const [orderType, setOrderType] = React.useState<OrdersTypes>(
+    type || OrdersTypes.DELIVERY
+  );
   const { t } = useTranslation();
 
   const onFinish = async (values: OrderData) => {
@@ -51,7 +54,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         : undefined,
     };
 
-    //TODO: remove this
+    //TODO: remove mock userId
     const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
 
     const prepOrderData: OrderData = {
@@ -59,19 +62,30 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     };
     prepOrderData.from_city = fromCity;
     prepOrderData.to_city = toCity;
-
+    
     if (mode === FormModes.CREATE) {
       if (userId && type) {
         const order = await ordersApi.createOrder(userId, type, prepOrderData);
-        console.log("Заказ создан:", order);
+        if (order) {
+          message.success(t("order-created"));
+          console.log("Заказ создан:", order);
+        } else {
+          message.error(t("order-create-error"));
+        }
       }
     } else {
       if (orderId) {
         const order = await ordersApi.updateOrder(orderId, prepOrderData);
-        console.log("Заказ обновлен:", order);
+        if (order) {
+          message.success(t("order-updated"));
+          console.log("Заказ обновлен:", order);
+        } else {
+          message.error(t("order-update-error"));
+        }
       }
     }
     setOrderLoading(false);
+    //TODO: redirect to orders list (my orders)
   };
   const handleSearch = async (value: string) => {
     setSearch(value);
@@ -86,7 +100,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   };
 
   const setFieldsValue = async (values: OrderData) => {
-    const lang =  userContext?.lang || Lang.EN;
+    const lang = userContext?.lang || Lang.EN;
     if (values.from_city) {
       const cityName = await ordersApi.getCityName(values.from_city, lang);
       form.setFieldsValue({
@@ -127,7 +141,10 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   };
 
   const getTitle = useMemo(() => {
-    return t(`order-${orderType}`) + (mode === FormModes.CREATE ? "" : ` #${orderId}`);
+    return (
+      t(`order-${orderType}`) +
+      (mode === FormModes.CREATE ? "" : ` #${orderId}`)
+    );
   }, [mode, orderId, t, orderType]);
 
   const getButtonText = useMemo(() => {
@@ -164,7 +181,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             name="from_city"
             label={t("from-city")}
             rules={[{ required: true, message: t("from-city-error") }]}
-            style={{textAlign: "left" }}
+            style={{ textAlign: "left" }}
           >
             <Select
               options={cities.map((city) => ({
@@ -204,7 +221,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             name="to_city"
             label={t("to-city")}
             rules={[{ required: true, message: t("to-city-error") }]}
-            style={{textAlign: "left" }}
+            style={{ textAlign: "left" }}
           >
             <Select
               options={cities.map((city) => ({
@@ -277,7 +294,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               onChange={(value) => {
                 form.setFieldsValue({ to_date: value });
               }}
-              placeholder={t("select-date")}    
+              placeholder={t("select-date")}
               size="large"
             />
           </Form.Item>
@@ -292,7 +309,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 paddingTop: "8px",
                 textAlign: "left",
                 verticalAlign: "top",
-              }}      
+              }}
             >
               <label htmlFor="weight">{t("weight")}</label>
             </div>
@@ -374,7 +391,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             </div>
           </div>
 
-          <div style={{ display: "table-row"}}>
+          <div style={{ display: "table-row" }}>
             <div
               style={{
                 display: "table-cell",
@@ -386,16 +403,16 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             >
               <label htmlFor="length">{t("length")}</label>
             </div>
-            <div style={{ display: "table-cell", }}>
+            <div style={{ display: "table-cell" }}>
               <Form.Item
                 name="length"
                 rules={[{ required: true, message: t("length-error") }]}
-                style={{ marginBottom: "16px"}}
+                style={{ marginBottom: "16px" }}
               >
                 <InputNumber
                   id="length"
                   min={0}
-                  style={{ width: "100%"}}
+                  style={{ width: "100%" }}
                   addonAfter="см"
                   placeholder={t("length-placeholder")}
                   size="large"
@@ -405,21 +422,29 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
           </div>
         </div>
         {type === OrdersTypes.DELIVERY && (
-            <Form.Item name="ready_to_send" style={{textAlign: "left" }}>
-              <Checkbox style={{fontSize: "14px" }}>{t("ready-to-send")}</Checkbox>
-            </Form.Item>
-          )}
-          {type === OrdersTypes.PICKUP && ( 
-            <Form.Item name="ready_to_receive" style={{textAlign: "left" }}>
-              <Checkbox style={{fontSize: "14px" }}>{t("ready-to-receive")}</Checkbox>
-            </Form.Item>
-          )}
+          <Form.Item name="ready_to_send" style={{ textAlign: "left" }}>
+            <Checkbox style={{ fontSize: "14px" }}>
+              {t("ready-to-send")}
+            </Checkbox>
+          </Form.Item>
+        )}
+        {type === OrdersTypes.PICKUP && (
+          <Form.Item name="ready_to_receive" style={{ textAlign: "left" }}>
+            <Checkbox style={{ fontSize: "14px" }}>
+              {t("ready-to-receive")}
+            </Checkbox>
+          </Form.Item>
+        )}
         <Form.Item
           name="description"
           label={t("description")}
           rules={[{ required: true, message: t("description-error") }]}
         >
-          <TextArea rows={4} placeholder={t("description-placeholder")} size="large" />
+          <TextArea
+            rows={4}
+            placeholder={t("description-placeholder")}
+            size="large"
+          />
         </Form.Item>
 
         <Form.Item>
@@ -434,24 +459,26 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             {getButtonText}
           </Button>
           {mode === FormModes.EDIT && (
-              <Popconfirm
+            <Popconfirm
               title={t(`popup-title-cancel-order-${orderType}`)}
               description={t(`popup-text-cancel-order-${orderType}`)}
               okText={t("yes")}
               cancelText={t("no")}
               onConfirm={handleCancel}
+              okButtonProps={{ danger: true, size: "large" }}
+              cancelButtonProps={{ size: "large" }}
             >
-            <Button
-              type="primary"
-              color="danger"
-              variant="outlined"
-              size="large"
-              block
-              loading={orderLoading}  
-              style={{marginTop: "12px"}}
-            >
-              {getCancelButtonText}
-            </Button>
+              <Button
+                type="primary"
+                color="danger"
+                variant="outlined"
+                size="large"
+                block
+                loading={orderLoading}
+                style={{ marginTop: "12px" }}
+              >
+                {getCancelButtonText}
+              </Button>
             </Popconfirm>
           )}
         </Form.Item>
