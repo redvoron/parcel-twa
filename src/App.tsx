@@ -5,8 +5,9 @@ import OrdersPage from "./pages/Orders";
 import { FormModes, OrdersViewType } from "./utils/constants";
 import { routes } from "./utils/routes";
 import OrderPage from "./pages/Order";
+
 function App() {
-   return (
+  return (
     <BrowserRouter basename="/parcel-twa">
       <Routes>
         <Route path="/" element={<MainPage />} />

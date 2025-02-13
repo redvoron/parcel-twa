@@ -45,6 +45,7 @@ function Root() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
   const showModal = () => {
     setIsModalOpen(true);
   };
