@@ -11,7 +11,7 @@ function App() {
     <BrowserRouter basename="/parcel-twa">
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path={routes.myOrders.path} element={<OrdersPage type={OrdersViewType.USER} />} />
+        <Route path={routes.myOrders.path} element={<OrdersPage type={OrdersViewType.MY} />} />
         <Route path={routes.deliveryOrders.path} element={<OrdersPage type={OrdersViewType.DELIVERY} />} />
         <Route path={routes.pickupOrders.path} element={<OrdersPage type={OrdersViewType.PICKUP} />} />
         <Route path={routes.userOrders.path} element={<OrdersPage type={OrdersViewType.USER} />} />

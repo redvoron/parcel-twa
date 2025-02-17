@@ -38,6 +38,15 @@ export enum OrdersTableColumns {
   DESCRIPTION = "description",
 }
 
+export enum OrdersSizes {
+  DOCUMENT = "document",
+  PACKAGE = "package",
+  SUITCASE_SMALL = "suitcase_small",
+  SUITCASE_MEDIUM = "suitcase_medium",
+  SUITCASE_LARGE = "suitcase_large",
+  OVERSIZE = "oversize",
+}
+
 export type AuthResult = {
   result: AuthResultType;
   message: string;

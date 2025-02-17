@@ -29,8 +29,8 @@
   "height": "Height",
   "length": "Length",
   "description": "Description",
-  "ready-to-send": "Ready to send",
-  "ready-to-receive": "Ready to receive",
+  "ready-to-send": "Ready to send via courier",
+  "ready-to-receive": "Ready to receive via courier",
   "from-city": "From",
   "to-city": "To",  
   "from-date": "Departure date",
@@ -64,5 +64,14 @@
   "order_status_delivering": "Delivering",
   "order_status_deleted": "Deleted",
   "destination": "Destination",
-  "dates": "Dates"
+  "dates": "Dates",
+  "size_document": "Document",
+  "size_package": "Package",
+  "size_oversize": "Oversize",
+  "size_suitcase_small": "Suitcase (up to 10 kg)",
+  "size_suitcase_medium": "Suitcase (up to 20 kg)",
+  "size_suitcase_large": "Suitcase (up to 30 kg)",
+  "sizes_to_pickup": "Ready to take sizes",
+  "sizes": "Sizes",
+  "size_placeholder": "Select sizes"
 }

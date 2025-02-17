@@ -1,5 +1,5 @@
 import supabase from "./supabaseClient";
-import { Lang, OrdersStatus, OrdersTypes } from "../utils/constants";
+import { Lang, OrdersSizes, OrdersStatus, OrdersTypes } from "../utils/constants";
 export type Order = {
   order_id: number
   type: OrdersTypes
@@ -26,6 +26,7 @@ export type OrderData = {
   price?: number
   ready_to_send?: boolean
   ready_to_receive?: boolean,
+  sizes?: OrdersSizes[]
 }
 
 export type OrderAction = {

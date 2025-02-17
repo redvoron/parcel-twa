@@ -8,10 +8,10 @@ import {
   OrdersTableColumns,
   Lang,
 } from "../utils/constants";
-import { Space, Table, Tag, Typography } from "antd";
+import { Space, Table, Tag, Button } from "antd";
 import type { TableProps } from "antd";
 import Title from "antd/es/typography/Title";
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, CalendarOutlined, CloseOutlined, InfoCircleOutlined, MessageOutlined } from "@ant-design/icons";
 import Flag from "react-world-flags";
 import { GlobalContext } from "../main";
 export type OrdersTableProps = {
@@ -23,8 +23,6 @@ export type OrdersTableProps = {
 const DEFAULT_VISIBLE_COLUMNS = [
   //OrdersTableColumns.CREATED_AT,
   OrdersTableColumns.DESTINATION,
-  OrdersTableColumns.DATES,
-  OrdersTableColumns.DESCRIPTION,
   // OrdersTableColumns.UPDATED_AT,
   OrdersTableColumns.ACTION,
 ];
@@ -35,6 +33,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   const [ordersTypes, setOrdersTypes] = useState<OrdersTypes[]>([]);
   const [ordersStatuses, setOrdersStatuses] = useState<OrdersStatus[]>([]);
   const [loading, setLoading] = useState(false);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+
   const { userContext } = useContext(GlobalContext);
   const [visibleColumns, setVisibleColumns] = useState<OrdersTableColumns[]>(
     DEFAULT_VISIBLE_COLUMNS
@@ -50,62 +50,62 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       render: (_text: string, record: Order) => {
         const cityNameProp = `name_${lang}`;
         return (
-          <Space direction="vertical">
-              <div style={{display: 'flex', alignItems: 'center'}}>
-               <ArrowLeftOutlined style={{marginRight: 4, color: 'green'}}/>
-                <Tag style={{display: 'flex', alignItems: 'center', fontSize: 14}}>
-                  <Flag code={record.from_city_data?.country_code} style={{width: 16, height: 12, marginRight: 4}}/>
-                  {record.from_city_data?.[cityNameProp as keyof typeof record.from_city_data] || t("city_any")}
+          <Space direction="horizontal">
+            <Space direction="vertical">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Tag
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: 14,
+                  }}
+                >
+                  <Flag
+                    code={record.from_city_data?.country_code}
+                    style={{ width: 16, height: 12, marginRight: 4 }}
+                  />
+                  {record.from_city_data?.[
+                    cityNameProp as keyof typeof record.from_city_data
+                  ] || t("city_any")}
                 </Tag>
               </div>
-              <div style={{display: 'flex', alignItems: 'center'}}>
-                <ArrowRightOutlined style={{marginRight: 4, color: 'blue'}} />
-                <Tag style={{display: 'flex', alignItems: 'center', fontSize: 14}}>
-                  <Flag code={record.to_city_data?.country_code} style={{width: 16, height: 12, marginRight: 4}}/>
-                  {record.to_city_data?.[cityNameProp as keyof typeof record.to_city_data] || t("city_any")}
+              
+              <Tag style={{ fontSize: 14 }}>
+              <CalendarOutlined style={{ marginRight: 4 }} />
+                {record.data.from_date
+                  ? new Date(record.data.from_date).toLocaleDateString()
+                  : t("date_open")}
+              </Tag>
+            </Space>
+            <ArrowRightOutlined style={{ marginRight: 4, color: "#007bff" }} />
+            <Space direction="vertical">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Tag
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: 14,
+                  }}
+                >
+                  <Flag
+                    code={record.to_city_data?.country_code}
+                    style={{ width: 16, height: 12, marginRight: 4 }}
+                  />
+                  {record.to_city_data?.[
+                    cityNameProp as keyof typeof record.to_city_data
+                  ] || t("city_any")}
                 </Tag>
               </div>
+              <Tag style={{ fontSize: 14 }}>
+                <CalendarOutlined style={{ marginRight: 4 }} />
+              {record.data.to_date
+                ? new Date(record.data.to_date).toLocaleDateString()
+                : t("date_open")}
+            </Tag>
+            </Space>
+
           </Space>
         );
-      },  
-    },
-    {
-      title: t("dates"),
-      dataIndex: "data",
-      key: "dates",
-      hidden: !visibleColumns.includes(OrdersTableColumns.DATES),
-        render: (_text: string, record: Order) => {
-        return <Space direction="vertical">
-          <Tag style={{fontSize: 14}}>
-            {record.data.from_date ? new Date(record.data.from_date).toLocaleDateString() : t("date_open")}
-          </Tag>
-          <Tag style={{fontSize: 14}}>
-            {record.data.to_date ? new Date(record.data.to_date).toLocaleDateString() : t("date_open")}
-          </Tag>
-        </Space>
-      },
-      sorter: (a, b) => {
-        const aDate = a.data.from_date ? new Date(a.data.from_date).getTime() : 0;
-        const bDate = b.data.from_date ? new Date(b.data.from_date).getTime() : 0;
-        return aDate - bDate;
-      },
-    },
-    {
-      title: t("description"),
-      dataIndex: "data",
-      key: "description",
-      hidden: !visibleColumns.includes(OrdersTableColumns.DESCRIPTION),
-      render: (_text: string, record: Order) => {
-        return       <Typography.Paragraph
-        ellipsis={{
-          rows: 2,
-          expandable: 'collapsible',
-          expanded: false,
-          onExpand: (_, info) => {
-            console.log(info);
-          },
-        }}
-      >{record.data.description}</Typography.Paragraph>;
       },
     },
     {
@@ -171,6 +171,17 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       sorter: (a, b) =>
         new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime(),
     },
+    {
+      title: '...',
+      dataIndex: "actions",
+      key: "actions",
+      hidden: !visibleColumns.includes(OrdersTableColumns.ACTION),
+      render: (_text, record: Order) => {
+        return <Space direction="vertical" data-column="actions">
+          <Button type="link" icon={<MessageOutlined />} onClick={() => onMessageClick(record)}/>
+        </Space>;
+      },
+    },
   ];
   const getOrdersTableParams = useMemo(() => {
     const ordersGetParams: GetOrdersParams = {
@@ -182,7 +193,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
         ordersGetParams.type = OrdersTypes.DELIVERY;
         break;
       case OrdersViewType.PICKUP:
-        ordersGetParams.action = [OrdersStatus.DELIVERING];
+        ordersGetParams.action = [OrdersStatus.CREATED];
         ordersGetParams.type = OrdersTypes.PICKUP;
         break;
       case OrdersViewType.MY:
@@ -196,11 +207,15 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     return ordersGetParams;
   }, [viewType, userId]);
 
+  const onMessageClick = (record: Order) => {
+    console.log(record);
+  }
+
   const changeVisibleColumns = () => {
     const columns = DEFAULT_VISIBLE_COLUMNS;
     if (viewType === OrdersViewType.MY || viewType === OrdersViewType.USER) {
-      columns.push(OrdersTableColumns.STATUS);
-      columns.push(OrdersTableColumns.TYPE);
+      // columns.push(OrdersTableColumns.STATUS);
+      // columns.push(OrdersTableColumns.TYPE);
     }
     setVisibleColumns(columns);
   };
@@ -214,6 +229,9 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     changeVisibleColumns();
     setLoading(false);
   };
+  const getTableHeader = useMemo(() => {
+    return t(`orders-${viewType}`);
+  }, [viewType, userId]);
 
   useEffect(() => {
     getData();
@@ -221,18 +239,57 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
 
   return (
     <>
-      <Title level={2}>---</Title>
+      <Title level={2}>{getTableHeader}</Title>
       <Table
         columns={ordersColumns}
+        expandable={{
+          expandedRowRender: (record) =>  {
+            const description = record.data.description || t("no_description");
+            const sizes_info = record.type === OrdersTypes.PICKUP ?
+              record.data.sizes?.map((size) => t(`size_${size}`)).join(", ") || "" 
+              : record.data.weight + t('kg') + ", " + record.data.height + "x" + record.data.width + "x" + record.data.length + t('cm');
+            return (
+              <Space direction="vertical">
+               {sizes_info && <span>
+                {t("sizes") + ": " + sizes_info}
+                </span>}
+                <span>
+                {description}
+                </span>
+
+              </Space>
+            );
+          },
+          expandIcon:({ expanded, onExpand, record }) =>
+            expanded ? (
+              <CloseOutlined onClick={e => onExpand(record, e)} />
+            ) : (
+              <InfoCircleOutlined onClick={e => onExpand(record, e)} />
+            ),
+        }}
+        onRow={(record) => ({
+          onClick: (e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('[data-column="actions"]')) {
+              return;
+            }
+            const newExpandedRows = expandedRowKeys.includes(record.order_id)
+              ? expandedRowKeys.filter(key => key !== record.order_id)
+              : [...expandedRowKeys, record.order_id];
+            setExpandedRowKeys(newExpandedRows);
+          },
+          style: { cursor: 'pointer' }
+        })}
+        expandedRowKeys={expandedRowKeys}
         dataSource={data}
         loading={loading}
         rowKey={(record) => record.order_id}
-        scroll={{ x: '100%' }}
+        scroll={{ x: "100%" }}
         size="small"
         pagination={{
           responsive: true,
-          position: ['bottomCenter'],
-          size: 'small'
+          position: ["bottomCenter"],
+          size: "small",
         }}
       />
     </>

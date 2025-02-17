@@ -15,7 +15,7 @@ import { ordersApi } from "../data/orders";
 import type { OrderData, CitySearchResult } from "../data/orders";
 import dayjs from "dayjs";
 import Flag from "react-world-flags";
-import { FormModes, Lang, OrdersTypes } from "../utils/constants";
+import { FormModes, Lang, OrdersSizes, OrdersTypes } from "../utils/constants";
 import { GlobalContext } from "../main";
 import { useTranslation } from "react-i18next";
 const { Title } = Typography;
@@ -62,7 +62,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     };
     prepOrderData.from_city = fromCity;
     prepOrderData.to_city = toCity;
-    
+
     if (mode === FormModes.CREATE) {
       if (userId && type) {
         const order = await ordersApi.createOrder(userId, type, prepOrderData);
@@ -126,6 +126,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
       ready_to_send: values.ready_to_send,
       ready_to_receive: values.ready_to_receive,
       description: values.description,
+      sizes: values.sizes,
     });
   };
   const getOrder = async () => {
@@ -300,136 +301,168 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
           </Form.Item>
         </div>
 
-        <div style={{ display: "table", width: "100%" }}>
-          <div style={{ display: "table-row" }}>
-            <div
-              style={{
-                display: "table-cell",
-                paddingRight: "8px",
-                paddingTop: "8px",
-                textAlign: "left",
-                verticalAlign: "top",
-              }}
-            >
-              <label htmlFor="weight">{t("weight")}</label>
-            </div>
-            <div style={{ display: "table-cell" }}>
-              <Form.Item
-                name="weight"
-                rules={[{ required: true, message: t("weight-error") }]}
-                style={{ marginBottom: "16px" }}
+        {orderType === OrdersTypes.DELIVERY && (
+          <div style={{ display: "table", width: "100%" }}>
+            <div style={{ display: "table-row" }}>
+              <div
+                style={{
+                  display: "table-cell",
+                  paddingRight: "8px",
+                  paddingTop: "8px",
+                  textAlign: "left",
+                  verticalAlign: "top",
+                }}
               >
-                <InputNumber
-                  id="weight"
-                  min={0}
-                  style={{ width: "100%" }}
-                  addonAfter="кг"
-                  placeholder={t("weight-placeholder")}
-                  size="large"
-                />
-              </Form.Item>
+                <label htmlFor="weight">{t("weight")}</label>
+              </div>
+              <div style={{ display: "table-cell" }}>
+                <Form.Item
+                  name="weight"
+                  rules={[{ required: true, message: t("weight-error") }]}
+                  style={{ marginBottom: "16px" }}
+                >
+                  <InputNumber
+                    id="weight"
+                    min={0}
+                    style={{ width: "100%" }}
+                    addonAfter="кг"
+                    placeholder={t("weight-placeholder")}
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
             </div>
-          </div>
 
-          <div style={{ display: "table-row" }}>
-            <div
-              style={{
-                display: "table-cell",
-                paddingRight: "8px",
-                paddingTop: "8px",
-                textAlign: "left",
-                verticalAlign: "top",
-              }}
-            >
-              <label htmlFor="width">{t("width")}</label>
-            </div>
-            <div style={{ display: "table-cell" }}>
-              <Form.Item
-                name="width"
-                rules={[{ required: true, message: t("width-error") }]}
-                style={{ marginBottom: "16px" }}
+            <div style={{ display: "table-row" }}>
+              <div
+                style={{
+                  display: "table-cell",
+                  paddingRight: "8px",
+                  paddingTop: "8px",
+                  textAlign: "left",
+                  verticalAlign: "top",
+                }}
               >
-                <InputNumber
-                  id="width"
-                  min={0}
-                  style={{ width: "100%" }}
-                  addonAfter="см"
-                  placeholder={t("width-placeholder")}
-                  size="large"
-                />
-              </Form.Item>
+                <label htmlFor="width">{t("width")}</label>
+              </div>
+              <div style={{ display: "table-cell" }}>
+                <Form.Item
+                  name="width"
+                  rules={[{ required: true, message: t("width-error") }]}
+                  style={{ marginBottom: "16px" }}
+                >
+                  <InputNumber
+                    id="width"
+                    min={0}
+                    style={{ width: "100%" }}
+                    addonAfter="см"
+                    placeholder={t("width-placeholder")}
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
             </div>
-          </div>
 
-          <div style={{ display: "table-row" }}>
-            <div
-              style={{
-                display: "table-cell",
-                paddingRight: "8px",
-                paddingTop: "8px",
-                textAlign: "left",
-                verticalAlign: "top",
-              }}
-            >
-              <label htmlFor="height">{t("height")}</label>
-            </div>
-            <div style={{ display: "table-cell" }}>
-              <Form.Item
-                name="height"
-                rules={[{ required: true, message: t("height-error") }]}
-                style={{ marginBottom: "16px" }}
+            <div style={{ display: "table-row" }}>
+              <div
+                style={{
+                  display: "table-cell",
+                  paddingRight: "8px",
+                  paddingTop: "8px",
+                  textAlign: "left",
+                  verticalAlign: "top",
+                }}
               >
-                <InputNumber
-                  id="height"
-                  min={0}
-                  style={{ width: "100%" }}
-                  addonAfter="см"
-                  placeholder={t("height-placeholder")}
-                  size="large"
-                />
-              </Form.Item>
+                <label htmlFor="height">{t("height")}</label>
+              </div>
+              <div style={{ display: "table-cell" }}>
+                <Form.Item
+                  name="height"
+                  rules={[{ required: true, message: t("height-error") }]}
+                  style={{ marginBottom: "16px" }}
+                >
+                  <InputNumber
+                    id="height"
+                    min={0}
+                    style={{ width: "100%" }}
+                    addonAfter="см"
+                    placeholder={t("height-placeholder")}
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
             </div>
-          </div>
 
-          <div style={{ display: "table-row" }}>
-            <div
-              style={{
-                display: "table-cell",
-                paddingRight: "8px",
-                paddingTop: "8px",
-                textAlign: "left",
-                verticalAlign: "top",
-              }}
-            >
-              <label htmlFor="length">{t("length")}</label>
-            </div>
-            <div style={{ display: "table-cell" }}>
-              <Form.Item
-                name="length"
-                rules={[{ required: true, message: t("length-error") }]}
-                style={{ marginBottom: "16px" }}
+            <div style={{ display: "table-row" }}>
+              <div
+                style={{
+                  display: "table-cell",
+                  paddingRight: "8px",
+                  paddingTop: "8px",
+                  textAlign: "left",
+                  verticalAlign: "top",
+                }}
               >
-                <InputNumber
-                  id="length"
-                  min={0}
-                  style={{ width: "100%" }}
-                  addonAfter="см"
-                  placeholder={t("length-placeholder")}
-                  size="large"
-                />
-              </Form.Item>
+                <label htmlFor="length">{t("length")}</label>
+              </div>
+              <div style={{ display: "table-cell" }}>
+                <Form.Item
+                  name="length"
+                  rules={[{ required: true, message: t("length-error") }]}
+                  style={{ marginBottom: "16px" }}
+                >
+                  <InputNumber
+                    id="length"
+                    min={0}
+                    style={{ width: "100%" }}
+                    addonAfter="см"
+                    placeholder={t("length-placeholder")}
+                    size="large"
+                  />
+                </Form.Item>
+              </div>
             </div>
           </div>
-        </div>
-        {type === OrdersTypes.DELIVERY && (
-          <Form.Item name="ready_to_send" style={{ textAlign: "left" }}>
+        )}
+        {orderType === OrdersTypes.PICKUP && (
+          <Form.Item
+            name="sizes"
+            label={t("sizes_to_pickup")}
+            rules={[{ required: true, message: t("sizes-error") }]}
+          >
+            <Select
+              size="large"
+              mode="multiple"
+              allowClear
+              style={{ width: "100%", textAlign: "left" }}
+              placeholder={t("sizes-placeholder")}
+              defaultValue={[]}
+              getPopupContainer={triggerNode => triggerNode.parentElement}
+              options={Object.values(OrdersSizes).map((size) => ({
+                key: size,
+                value: size,
+                label: t(`size_${size}`)
+              }))}
+            />
+          </Form.Item>
+        )}
+        {orderType === OrdersTypes.DELIVERY && (
+          <Form.Item
+            name="ready_to_send"
+            valuePropName="checked"
+            style={{ textAlign: "left" }}
+          >
             <Checkbox style={{ fontSize: "14px" }}>
               {t("ready-to-send")}
             </Checkbox>
           </Form.Item>
         )}
-        {type === OrdersTypes.PICKUP && (
-          <Form.Item name="ready_to_receive" style={{ textAlign: "left" }}>
+        {orderType === OrdersTypes.PICKUP && (
+          <Form.Item
+            name="ready_to_receive"
+            valuePropName="checked"
+            style={{ textAlign: "left" }}
+          >
             <Checkbox style={{ fontSize: "14px" }}>
               {t("ready-to-receive")}
             </Checkbox>

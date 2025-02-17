@@ -62,7 +62,16 @@
   "order_status_created": "Новый",
   "order_status_delivered": "Доставлен",
   "order_status_delivering": "Доставляется",
-  "order_status_deleted": "Удален",
+  "order_status_deleted": "Удален", 
   "destination": "Направление",
-  "dates": "Даты"
+  "dates": "Даты",
+  "size_document": "Документы",
+  "size_package": "Пакет",
+  "size_oversize": "Негабарит",
+  "size_suitcase_small": "Чемодан (до 10 кг)",
+  "size_suitcase_medium": "Чемодан (до 20 кг)",
+  "size_suitcase_large": "Чемодан (до 30 кг)",
+  "sizes_to_pickup": "Готов взять размеры",
+  "sizes": "Размеры",
+  "size_placeholder": "Выберите размеры"
 }
