@@ -437,7 +437,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
               style={{ width: "100%", textAlign: "left" }}
               placeholder={t("sizes-placeholder")}
               defaultValue={[]}
-              getPopupContainer={triggerNode => triggerNode.parentElement}
+              showSearch={false}
+              placement="topLeft"
               options={Object.values(OrdersSizes).map((size) => ({
                 key: size,
                 value: size,
