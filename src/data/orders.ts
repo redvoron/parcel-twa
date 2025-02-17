@@ -8,7 +8,9 @@ export type Order = {
   action: OrdersStatus
   courier_id: string
   customer_id: string
-  data: OrderData
+  data: OrderData,
+  from_city_data?: City,
+  to_city_data?: City
 }
 
 export type OrderData = {
@@ -23,7 +25,7 @@ export type OrderData = {
   description?: string
   price?: number
   ready_to_send?: boolean
-  ready_to_receive?: boolean
+  ready_to_receive?: boolean,
 }
 
 export type OrderAction = {
@@ -336,7 +338,7 @@ export const ordersApi = {
 
     return data as CitySearchResult[]
   },
-  async getCityName(id: number, lang: Lang): Promise<{city_name: string}> {
+  async getCityName(id: number, lang: Lang): Promise<{city_name: string, country_code: string}> {
     const { data, error } = await supabase
       .from('cities')
       .select('*')
@@ -345,11 +347,12 @@ export const ordersApi = {
 
     if (error) {
       console.error('Error fetching city name:', error)
-      return {city_name: ''}
+      return {city_name: '', country_code: ''}
     }
 
     return {
-      city_name: lang === Lang.RU ? `${data.name_ru}, ${data.country_ru}` : `${data.name_en}, ${data.country_en}`
+      city_name: lang === Lang.RU ? `${data.name_ru}, ${data.country_ru}` : `${data.name_en}, ${data.country_en}`,
+      country_code: data.country_code
     }
   }
 }

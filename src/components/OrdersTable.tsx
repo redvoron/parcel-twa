@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Order, ordersApi, GetOrdersParams } from "../data/orders";
 import {
@@ -6,10 +6,14 @@ import {
   OrdersTypes,
   OrdersViewType,
   OrdersTableColumns,
+  Lang,
 } from "../utils/constants";
-import { Table, Tag } from "antd";
+import { Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
-
+import Title from "antd/es/typography/Title";
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import Flag from "react-world-flags";
+import { GlobalContext } from "../main";
 export type OrdersTableProps = {
   viewType: OrdersViewType;
   userId?: string;
@@ -17,21 +21,95 @@ export type OrdersTableProps = {
 };
 
 const DEFAULT_VISIBLE_COLUMNS = [
-  OrdersTableColumns.CREATED_AT,
-  OrdersTableColumns.UPDATED_AT,
+  //OrdersTableColumns.CREATED_AT,
+  OrdersTableColumns.DESTINATION,
+  OrdersTableColumns.DATES,
+  OrdersTableColumns.DESCRIPTION,
+  // OrdersTableColumns.UPDATED_AT,
+  OrdersTableColumns.ACTION,
 ];
+
 const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   const { t } = useTranslation();
   const [data, setData] = useState<Order[]>([]);
   const [ordersTypes, setOrdersTypes] = useState<OrdersTypes[]>([]);
   const [ordersStatuses, setOrdersStatuses] = useState<OrdersStatus[]>([]);
   const [loading, setLoading] = useState(false);
+  const { userContext } = useContext(GlobalContext);
   const [visibleColumns, setVisibleColumns] = useState<OrdersTableColumns[]>(
     DEFAULT_VISIBLE_COLUMNS
   );
+  const lang: Lang = userContext?.lang || Lang.RU;
+
   const ordersColumns: TableProps<Order>["columns"] = [
     {
-      title: "Тип",
+      title: t("destination"),
+      dataIndex: "data",
+      key: "data",
+      hidden: !visibleColumns.includes(OrdersTableColumns.DESTINATION),
+      render: (_text: string, record: Order) => {
+        const cityNameProp = `name_${lang}`;
+        return (
+          <Space direction="vertical">
+              <div style={{display: 'flex', alignItems: 'center'}}>
+               <ArrowLeftOutlined style={{marginRight: 4, color: 'green'}}/>
+                <Tag style={{display: 'flex', alignItems: 'center', fontSize: 14}}>
+                  <Flag code={record.from_city_data?.country_code} style={{width: 16, height: 12, marginRight: 4}}/>
+                  {record.from_city_data?.[cityNameProp as keyof typeof record.from_city_data] || t("city_any")}
+                </Tag>
+              </div>
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                <ArrowRightOutlined style={{marginRight: 4, color: 'blue'}} />
+                <Tag style={{display: 'flex', alignItems: 'center', fontSize: 14}}>
+                  <Flag code={record.to_city_data?.country_code} style={{width: 16, height: 12, marginRight: 4}}/>
+                  {record.to_city_data?.[cityNameProp as keyof typeof record.to_city_data] || t("city_any")}
+                </Tag>
+              </div>
+          </Space>
+        );
+      },  
+    },
+    {
+      title: t("dates"),
+      dataIndex: "data",
+      key: "dates",
+      hidden: !visibleColumns.includes(OrdersTableColumns.DATES),
+        render: (_text: string, record: Order) => {
+        return <Space direction="vertical">
+          <Tag style={{fontSize: 14}}>
+            {record.data.from_date ? new Date(record.data.from_date).toLocaleDateString() : t("date_open")}
+          </Tag>
+          <Tag style={{fontSize: 14}}>
+            {record.data.to_date ? new Date(record.data.to_date).toLocaleDateString() : t("date_open")}
+          </Tag>
+        </Space>
+      },
+      sorter: (a, b) => {
+        const aDate = a.data.from_date ? new Date(a.data.from_date).getTime() : 0;
+        const bDate = b.data.from_date ? new Date(b.data.from_date).getTime() : 0;
+        return aDate - bDate;
+      },
+    },
+    {
+      title: t("description"),
+      dataIndex: "data",
+      key: "description",
+      hidden: !visibleColumns.includes(OrdersTableColumns.DESCRIPTION),
+      render: (_text: string, record: Order) => {
+        return       <Typography.Paragraph
+        ellipsis={{
+          rows: 2,
+          expandable: 'collapsible',
+          expanded: false,
+          onExpand: (_, info) => {
+            console.log(info);
+          },
+        }}
+      >{record.data.description}</Typography.Paragraph>;
+      },
+    },
+    {
+      title: t("type"),
       dataIndex: "type",
       key: "type",
       hidden: !visibleColumns.includes(OrdersTableColumns.TYPE),
@@ -51,14 +129,14 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       ],
     },
     {
-      title: "Статус",
+      title: t("status"),
       dataIndex: "action",
       key: "action",
       hidden: !visibleColumns.includes(OrdersTableColumns.STATUS),
       render: (text: string) => {
         return (
           <Tag color={text === OrdersStatus.DELIVERING ? "blue" : "green"}>
-            {t(text)}
+            {t(`order_status_${text}`)}
           </Tag>
         );
       },
@@ -71,7 +149,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       ],
     },
     {
-      title: "Дата создания",
+      title: t("created_at"),
       dataIndex: "created_at",
       key: "created_at",
       hidden: !visibleColumns.includes(OrdersTableColumns.CREATED_AT),
@@ -83,7 +161,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
         new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
     },
     {
-      title: "Дата обновления",
+      title: t("updated_at"),
       dataIndex: "updated_at",
       key: "updated_at",
       hidden: !visibleColumns.includes(OrdersTableColumns.UPDATED_AT),
@@ -120,10 +198,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
 
   const changeVisibleColumns = () => {
     const columns = DEFAULT_VISIBLE_COLUMNS;
-    if (
-      viewType === OrdersViewType.MY ||
-      viewType === OrdersViewType.USER
-    ) {
+    if (viewType === OrdersViewType.MY || viewType === OrdersViewType.USER) {
       columns.push(OrdersTableColumns.STATUS);
       columns.push(OrdersTableColumns.TYPE);
     }
@@ -145,12 +220,22 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   }, [userId, viewType]);
 
   return (
-    <Table
-      columns={ordersColumns}
-      dataSource={data}
-      loading={loading}
-      rowKey={(record) => record.order_id}
-    />
+    <>
+      <Title level={2}>---</Title>
+      <Table
+        columns={ordersColumns}
+        dataSource={data}
+        loading={loading}
+        rowKey={(record) => record.order_id}
+        scroll={{ x: '100%' }}
+        size="small"
+        pagination={{
+          responsive: true,
+          position: ['bottomCenter'],
+          size: 'small'
+        }}
+      />
+    </>
   );
 };
 

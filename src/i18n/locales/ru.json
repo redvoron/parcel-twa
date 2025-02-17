@@ -47,5 +47,22 @@
   "popup-text-cancel-order-delivery": "Вы уверены, что хотите отменить заказ?",
   "popup-text-cancel-order-pickup": "Вы уверены, что хотите отменить услугу?",
   "kg": "кг",
-  "cm": "см"
+  "cm": "см",
+  "type": "Тип",
+  "status": "Статус",
+  "created_at": "Создан",
+  "updated_at": "Обновлен",
+  "actions": "Действия",
+  "date_open": "Открытая дата",
+  "city_any": "Обсуждаемо",
+  "delivery": "Доставка",
+  "pickup": "Перевозка",
+  "order_status_completed": "Выполнен",
+  "order_status_cancelled": "Отменен",
+  "order_status_created": "Новый",
+  "order_status_delivered": "Доставлен",
+  "order_status_delivering": "Доставляется",
+  "order_status_deleted": "Удален",
+  "destination": "Направление",
+  "dates": "Даты"
 }

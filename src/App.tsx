@@ -1,10 +1,10 @@
 import "./App.css";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import MainPage from "./pages/Main";
-import OrdersPage from "./pages/Orders";
+import MainPage from "./pages/MainPage";
+import OrdersPage from "./pages/OrdersPage";
 import { FormModes, OrdersViewType } from "./utils/constants";
 import { routes } from "./utils/routes";
-import OrderPage from "./pages/Order";
+import OrderPage from "./pages/OrderPage";
 
 function App() {
   return (

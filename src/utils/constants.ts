@@ -33,6 +33,9 @@ export enum OrdersTableColumns {
   ACTION = "action",
   CREATED_AT = "created_at",
   UPDATED_AT = "updated_at",
+  DESTINATION = "destination",
+  DATES = "dates",
+  DESCRIPTION = "description",
 }
 
 export type AuthResult = {

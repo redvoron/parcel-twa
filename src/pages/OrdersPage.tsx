@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 import OrdersTable from "../components/OrdersTable";
 import { OrdersViewType } from "../utils/constants";
 import { GetOrdersParams } from "../data/orders";
@@ -13,7 +11,6 @@ interface OrdersPageProps {
 }
 
 const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
-  const { t } = useTranslation();
   const { userId } = useParams();
   const navigate = useNavigate();
   
@@ -26,10 +23,9 @@ const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
       WebApp.BackButton.hide();
     };
   }, [navigate]); 
-  
+
   return (
-    <div>
-      <h1>{t("orders")}</h1>
+    <div className="page">
       <OrdersTable viewType={type} userId={userId} extraParams={extraParams} />
     </div>
   );

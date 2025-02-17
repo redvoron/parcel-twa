@@ -47,5 +47,22 @@
   "popup-text-cancel-order-delivery": "Are you sure you want to cancel the order?",
   "popup-text-cancel-order-pickup": "Are you sure you want to cancel the service?",
   "kg": "kg",
-  "cm": "cm"
+  "cm": "cm",
+  "type": "Type",
+  "status": "Status",
+  "created_at": "Created",
+  "updated_at": "Updated",
+  "actions": "Actions",
+  "date_open": "Open date",
+  "city_any": "Discussed",
+  "delivery": "Delivery",
+  "pickup": "Transportation",
+  "order_status_completed": "Completed",
+  "order_status_cancelled": "Cancelled",
+  "order_status_created": "New",
+  "order_status_delivered": "Delivered",
+  "order_status_delivering": "Delivering",
+  "order_status_deleted": "Deleted",
+  "destination": "Destination",
+  "dates": "Dates"
 }

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 const ChatPage = () => {
   const { t } = useTranslation();
   return (
-    <div>
+    <div className="page">
       <h1>{t("chat")}</h1>
     </div>
   );

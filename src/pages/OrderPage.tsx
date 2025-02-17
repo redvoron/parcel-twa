@@ -19,7 +19,7 @@ const OrderPage = ({ mode }: { mode: FormModes }) => {
   }, [navigate]); 
 
   return (
-    <div>
+    <div className="page">
       <OrderForm
         mode={mode as FormModes}
         orderId={orderId ? parseInt(orderId) : undefined}
