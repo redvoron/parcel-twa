@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Order, ordersApi, GetOrdersParams } from "../data/orders";
+import { CalendarClock, MessageCircleMore, Plane } from 'lucide-react'
 import {
   OrdersStatus,
   OrdersTypes,
@@ -11,7 +12,6 @@ import {
 import { Space, Table, Tag, Button } from "antd";
 import type { TableProps } from "antd";
 import Title from "antd/es/typography/Title";
-import { ArrowRightOutlined, CalendarOutlined, CloseOutlined, InfoCircleOutlined, MessageOutlined } from "@ant-design/icons";
 import Flag from "react-world-flags";
 import { GlobalContext } from "../main";
 export type OrdersTableProps = {
@@ -71,7 +71,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                 </Tag>
               </div>
               <div style={{ display: "flex", alignItems: "center" }}>
-              <CalendarOutlined style={{ marginRight: 0, paddingLeft: 0, width: 20, height: 16 }} />
+              <CalendarClock style={{ marginRight: 4, width: 16 }} />
                 <Tag style={{ fontSize: 14 }}>
 
                 {record.data.from_date
@@ -80,7 +80,10 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
               </Tag>
               </div>
             </Space>
-            <ArrowRightOutlined style={{ marginRight: 4, color: "#007bff" }} />
+            <Space direction="vertical">
+            <Plane style={{ color: "#6B7280" , marginRight: 4, marginTop: 4}} />
+            </Space>
+
             <Space direction="vertical">
               <div style={{ display: "flex", alignItems: "center" }}>
               <Flag
@@ -101,7 +104,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                 </Tag>
               </div>
               <div style={{ display: "flex", alignItems: "center" }}>
-                <CalendarOutlined style={{ marginRight: 4, width: 16, height: 16 }} />
+                <CalendarClock style={{ marginRight: 4, width: 16 }} />
                 <Tag style={{ fontSize: 14 }}>
               {record.data.to_date
                 ? new Date(record.data.to_date).toLocaleDateString()
@@ -162,7 +165,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       hidden: !visibleColumns.includes(OrdersTableColumns.ACTION),
       render: (_text, record: Order) => {
         return <Space direction="vertical" data-column="actions">
-          <Button type="link" icon={<MessageOutlined />} onClick={(e) => onMessageClick(record, e)}/>
+          <Button type="link" icon={<MessageCircleMore />} onClick={(e) => onMessageClick(record, e)}/>
         </Space>;
       },
     },
