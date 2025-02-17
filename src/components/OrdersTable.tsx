@@ -33,7 +33,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   const [ordersTypes, setOrdersTypes] = useState<OrdersTypes[]>([]);
   const [ordersStatuses, setOrdersStatuses] = useState<OrdersStatus[]>([]);
   const [loading, setLoading] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  
 
   const { userContext } = useContext(GlobalContext);
   const [visibleColumns, setVisibleColumns] = useState<OrdersTableColumns[]>(
@@ -53,6 +53,10 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
           <Space direction="horizontal">
             <Space direction="vertical">
               <div style={{ display: "flex", alignItems: "center" }}>
+                <Flag
+                  code={record.from_city_data?.country_code}
+                  style={{ width: 16, height: 12, marginRight: 4 }}
+                />
                 <Tag
                   style={{
                     display: "flex",
@@ -60,26 +64,29 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                     fontSize: 14,
                   }}
                 >
-                  <Flag
-                    code={record.from_city_data?.country_code}
-                    style={{ width: 16, height: 12, marginRight: 4 }}
-                  />
+
                   {record.from_city_data?.[
                     cityNameProp as keyof typeof record.from_city_data
                   ] || t("city_any")}
                 </Tag>
               </div>
-              
-              <Tag style={{ fontSize: 14 }}>
-              <CalendarOutlined style={{ marginRight: 4 }} />
+              <div style={{ display: "flex", alignItems: "center" }}>
+              <CalendarOutlined style={{ marginRight: 0, paddingLeft: 0, width: 20, height: 16 }} />
+                <Tag style={{ fontSize: 14 }}>
+
                 {record.data.from_date
                   ? new Date(record.data.from_date).toLocaleDateString()
                   : t("date_open")}
               </Tag>
+              </div>
             </Space>
             <ArrowRightOutlined style={{ marginRight: 4, color: "#007bff" }} />
             <Space direction="vertical">
               <div style={{ display: "flex", alignItems: "center" }}>
+              <Flag
+                    code={record.to_city_data?.country_code}
+                    style={{ width: 16, height: 12, marginRight: 4 }}
+                  />
                 <Tag
                   style={{
                     display: "flex",
@@ -87,21 +94,20 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                     fontSize: 14,
                   }}
                 >
-                  <Flag
-                    code={record.to_city_data?.country_code}
-                    style={{ width: 16, height: 12, marginRight: 4 }}
-                  />
+
                   {record.to_city_data?.[
                     cityNameProp as keyof typeof record.to_city_data
                   ] || t("city_any")}
                 </Tag>
               </div>
-              <Tag style={{ fontSize: 14 }}>
-                <CalendarOutlined style={{ marginRight: 4 }} />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <CalendarOutlined style={{ marginRight: 4, width: 16, height: 16 }} />
+                <Tag style={{ fontSize: 14 }}>
               {record.data.to_date
                 ? new Date(record.data.to_date).toLocaleDateString()
                 : t("date_open")}
-            </Tag>
+              </Tag>
+              </div>
             </Space>
 
           </Space>
@@ -149,36 +155,14 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       ],
     },
     {
-      title: t("created_at"),
-      dataIndex: "created_at",
-      key: "created_at",
-      hidden: !visibleColumns.includes(OrdersTableColumns.CREATED_AT),
-      responsive: ["md"],
-      render: (text: string) => {
-        return new Date(text).toLocaleString();
-      },
-      sorter: (a, b) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-    },
-    {
-      title: t("updated_at"),
-      dataIndex: "updated_at",
-      key: "updated_at",
-      hidden: !visibleColumns.includes(OrdersTableColumns.UPDATED_AT),
-      render: (text: string) => {
-        return new Date(text).toLocaleString();
-      },
-      sorter: (a, b) =>
-        new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime(),
-    },
-    {
       title: '...',
       dataIndex: "actions",
       key: "actions",
+      fixed: 'right',
       hidden: !visibleColumns.includes(OrdersTableColumns.ACTION),
       render: (_text, record: Order) => {
         return <Space direction="vertical" data-column="actions">
-          <Button type="link" icon={<MessageOutlined />} onClick={() => onMessageClick(record)}/>
+          <Button type="link" icon={<MessageOutlined />} onClick={(e) => onMessageClick(record, e)}/>
         </Space>;
       },
     },
@@ -207,7 +191,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     return ordersGetParams;
   }, [viewType, userId]);
 
-  const onMessageClick = (record: Order) => {
+  const onMessageClick = (record: Order, e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     console.log(record);
   }
 
@@ -247,7 +232,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
             const description = record.data.description || t("no_description");
             const sizes_info = record.type === OrdersTypes.PICKUP ?
               record.data.sizes?.map((size) => t(`size_${size}`)).join(", ") || "" 
-              : record.data.weight + t('kg') + ", " + record.data.height + "x" + record.data.width + "x" + record.data.length + t('cm');
+              : (record.data.weight && record.data.height && record.data.width && record.data.length) ? record.data.weight + t('kg') + ", " + record.data.height + "x" + record.data.width + "x" + record.data.length + t('cm') : "";
             return (
               <Space direction="vertical">
                {sizes_info && <span>
@@ -260,31 +245,13 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
               </Space>
             );
           },
-          expandIcon:({ expanded, onExpand, record }) =>
-            expanded ? (
-              <CloseOutlined onClick={e => onExpand(record, e)} />
-            ) : (
-              <InfoCircleOutlined onClick={e => onExpand(record, e)} />
-            ),
+          showExpandColumn: false,
+          expandRowByClick: true,
         }}
-        onRow={(record) => ({
-          onClick: (e) => {
-            const target = e.target as HTMLElement;
-            if (target.closest('[data-column="actions"]')) {
-              return;
-            }
-            const newExpandedRows = expandedRowKeys.includes(record.order_id)
-              ? expandedRowKeys.filter(key => key !== record.order_id)
-              : [...expandedRowKeys, record.order_id];
-            setExpandedRowKeys(newExpandedRows);
-          },
-          style: { cursor: 'pointer' }
-        })}
-        expandedRowKeys={expandedRowKeys}
         dataSource={data}
         loading={loading}
         rowKey={(record) => record.order_id}
-        scroll={{ x: "100%" }}
+        scroll={{ x: "max-content" }}
         size="small"
         pagination={{
           responsive: true,
