@@ -2,6 +2,7 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  --primary-color: #007bff;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -16,12 +17,10 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary-color);
   text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
-}
+
 
 body {
   margin: 0;
@@ -48,7 +47,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary-color);
 }
 button:focus,
 button:focus-visible {
@@ -69,9 +68,42 @@ input, select, textarea, label {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
+    color: #0056b3;
   }
   button {
     background-color: #f9f9f9;
   }
 }
+.telegram-menu {
+  margin-top: 48px;
+}
+.telegram-menu .ant-menu-submenu {
+  background-color: #007bff;
+  .ant-menu-item-icon {
+    color: #fff;
+  }
+  .ant-menu-title-content {
+    color: #fff;
+    padding-left: 0px !important;
+    margin-left: -4px !important;
+  }
+  .ant-menu-submenu-title {
+    padding-top: 4px;
+    padding-left: 12px !important;
+    margin-bottom: 0px !important;
+    text-transform: uppercase;
+    
+  }
+  .ant-menu-submenu-arrow {
+    display: none;
+  }
+  .ant-menu-item-only-child {
+    background-color: #fff !important;
+    padding-left: 16px !important;
+    .ant-menu-title-content {
+      color: #007bff !important;
+      margin-left: unset !important;
+    }
+  }
+}
+

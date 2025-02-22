@@ -1,9 +1,13 @@
 {
   "welcome": "Welcome",
+  "send-parcel": "Send parcel",
+  "transport": "Transport parcel",
   "orders": "Orders and services",
   "orders-my": "My orders and services",
   "orders-delivery": "Delivery orders",
+  "view-orders-delivery": "View delivery orders",
   "orders-pickup": "Transportation services",
+  "view-orders-pickup": "View transportation services",
   "orders-user": "User orders",
   "chat": "Chat",
   "arrival": "Arrival",

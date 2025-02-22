@@ -30,7 +30,7 @@ export const GlobalContext = createContext<GlobalContextType>(globalContext);
 
 const telegramTheme = {
   token: {
-    colorPrimary: "#0088cc", // Основной синий цвет Telegram
+    colorPrimary: "#007bff", // Основной синий цвет Telegram
     colorTextBase: "#000", // Основной текст черный
     colorBgBase: "#ffffff", // Фон белый
     colorBorder: "#e0e0e0", // Цвет границ, как в Telegram

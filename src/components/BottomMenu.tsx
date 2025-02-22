@@ -1,6 +1,6 @@
 import { Button } from "antd";
-import { HomeOutlined, MessageOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { MessageCircleMore, HomeIcon, UserRoundIcon } from "lucide-react";
 
 const BottomMenu = () => {
   const navigate = useNavigate();
@@ -21,25 +21,22 @@ const BottomMenu = () => {
       }}
     >
       <Button
-        icon={<HomeOutlined />}
+        icon={<HomeIcon />}
         size="large"
-        variant="outlined"
-        style={{ color: "#007bff" }}
+        color="primary"
+        variant="link"
         onClick={() => navigate("/")}
       ></Button>
       <Button
-        icon={<MessageOutlined />}
+        type="link"
+        icon={<UserRoundIcon />}
         size="large"
-        variant="outlined"
-        style={{ color: "#007bff" }}
-        onClick={() => navigate("/orders/my")}
+        onClick={() => navigate("/chat")}
       ></Button>
       <Button
-        icon={<UserOutlined />}
-        size="large"
-        variant="outlined"
-        style={{ color: "#007bff" }}
-        onClick={() => navigate("/chat")}
+        type="link"
+        icon={<MessageCircleMore />}
+        onClick={() => navigate("/orders/my")}
       ></Button>
     </div>
   );
