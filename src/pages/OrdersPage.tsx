@@ -4,6 +4,7 @@ import { GetOrdersParams } from "../data/orders";
 import { useNavigate, useParams } from "react-router-dom";
 import WebApp from "@twa-dev/sdk";
 import { useEffect } from "react";
+import BottomMenu from "../components/BottomMenu";
 
 interface OrdersPageProps {
   type: OrdersViewType;
@@ -27,6 +28,7 @@ const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
   return (
     <div className="page">
       <OrdersTable viewType={type} userId={userId} extraParams={extraParams} />
+      <BottomMenu />
     </div>
   );
 };

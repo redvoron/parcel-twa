@@ -27,6 +27,7 @@ export type OrderData = {
   ready_to_send?: boolean
   ready_to_receive?: boolean,
   sizes?: OrdersSizes[]
+  cargo_types?: number[]
 }
 
 export type OrderAction = {
@@ -65,6 +66,12 @@ export type CitySearchResult = {
   city_ru: string
   city_en: string,
   country_code: string
+}
+
+export type CargoType = {
+  id: number
+  name_ru: string
+  name_en: string
 }
 
 export const ordersApi = {
@@ -355,5 +362,17 @@ export const ordersApi = {
       city_name: lang === Lang.RU ? `${data.name_ru}, ${data.country_ru}` : `${data.name_en}, ${data.country_en}`,
       country_code: data.country_code
     }
+  },
+  async getCargoTypes(): Promise<CargoType[]> {
+    const { data, error } = await supabase
+      .from('cargo_types')
+      .select('*')
+
+    if (error) {
+      console.error('Error fetching cargo types:', error)
+      return []
+    }
+
+    return data
   }
 }

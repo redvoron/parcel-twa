@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Order, ordersApi, GetOrdersParams } from "../data/orders";
+import { Order, ordersApi, GetOrdersParams, CargoType } from "../data/orders";
 import { CalendarClock, MessageCircleMore, Plane } from 'lucide-react'
 import {
   OrdersStatus,
@@ -32,7 +32,9 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   const [data, setData] = useState<Order[]>([]);
   const [ordersTypes, setOrdersTypes] = useState<OrdersTypes[]>([]);
   const [ordersStatuses, setOrdersStatuses] = useState<OrdersStatus[]>([]);
+  const [cargoTypes, setCargoTypes] = useState<CargoType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
   
 
   const { userContext } = useContext(GlobalContext);
@@ -214,6 +216,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     setData(data.data);
     setOrdersTypes(data.ordersTypes);
     setOrdersStatuses(data.ordersStatuses);
+    const cargoTypes = await ordersApi.getCargoTypes();
+    setCargoTypes(cargoTypes);
     changeVisibleColumns();
     setLoading(false);
   };
@@ -236,10 +240,14 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
             const sizes_info = record.type === OrdersTypes.PICKUP ?
               record.data.sizes?.map((size) => t(`size_${size}`)).join(", ") || "" 
               : (record.data.weight && record.data.height && record.data.width && record.data.length) ? record.data.weight + t('kg') + ", " + record.data.height + "x" + record.data.width + "x" + record.data.length + t('cm') : "";
+            const cargo_types_info = record.data.cargo_types?.map((type) => cargoTypes.find((cargoType) => cargoType.id === type)?.[`name_${lang}`] || "").join(", ") || "";
             return (
               <Space direction="vertical">
                {sizes_info && <span>
                 {t("sizes") + ": " + sizes_info}
+                </span>}
+                {cargo_types_info && <span>
+                {t("cargo-types") + ": " + cargo_types_info}
                 </span>}
                 <span>
                 {description}
@@ -250,11 +258,19 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
           },
           showExpandColumn: false,
           expandRowByClick: true,
+          expandedRowKeys: expandedRowKeys,
+          onExpand: (expanded, record) => {
+            if (expanded) {
+              setExpandedRowKeys([record.order_id]);
+            } else {
+              setExpandedRowKeys([]);
+            }
+          }
         }}
         dataSource={data}
         loading={loading}
         rowKey={(record) => record.order_id}
-        scroll={{ x: "max-content" }}
+        scroll={{ x: "max-content", y: "calc(100vh - 246px)" }}
         size="small"
         pagination={{
           responsive: true,

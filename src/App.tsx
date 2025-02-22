@@ -17,7 +17,6 @@ function App() {
         <Route path={routes.userOrders.path} element={<OrdersPage type={OrdersViewType.USER} />} />
         <Route path={routes.orderEdit.path} element={<OrderPage mode={FormModes.EDIT} />} />
         <Route path={routes.orderCreate.path} element={<OrderPage mode={FormModes.CREATE} />} />
-
       </Routes>
     </BrowserRouter>
   );

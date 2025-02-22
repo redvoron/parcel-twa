@@ -73,5 +73,8 @@
   "size_suitcase_large": "Чемодан (до 30 кг)",
   "sizes_to_pickup": "Готов взять размеры",
   "sizes": "Размеры",
-  "sizes-placeholder": "Выберите размеры"
+  "sizes-placeholder": "Выберите размеры",
+  "cargo-types": "Типы грузов",
+  "cargo-type-placeholder": "Выберите типы грузов",
+  "cargo-type-error": "Выберите типы грузов"
 }

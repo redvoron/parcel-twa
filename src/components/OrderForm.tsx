@@ -10,9 +10,11 @@ import {
   Checkbox,
   Popconfirm,
   message,
+  Spin,
 } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { ordersApi } from "../data/orders";
-import type { OrderData, CitySearchResult } from "../data/orders";
+import type { OrderData, CitySearchResult, CargoType } from "../data/orders";
 import dayjs from "dayjs";
 import Flag from "react-world-flags";
 import { FormModes, Lang, OrdersSizes, OrdersTypes } from "../utils/constants";
@@ -36,11 +38,13 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [toCity, setToCity] = React.useState<number>(0);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [orderLoading, setOrderLoading] = React.useState<boolean>(false);
+  const [cargoTypes, setCargoTypes] = React.useState<CargoType[]>([]);
   const { userContext } = useContext(GlobalContext);
   const [orderType, setOrderType] = React.useState<OrdersTypes>(
     type || OrdersTypes.DELIVERY
   );
   const { t } = useTranslation();
+  const lang = userContext?.lang || Lang.EN;
 
   const onFinish = async (values: OrderData) => {
     setOrderLoading(true);
@@ -100,7 +104,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
   };
 
   const setFieldsValue = async (values: OrderData) => {
-    const lang = userContext?.lang || Lang.EN;
+    
     if (values.from_city) {
       const cityName = await ordersApi.getCityName(values.from_city, lang);
       form.setFieldsValue({
@@ -125,11 +129,13 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
       length: values.length,
       ready_to_send: values.ready_to_send,
       ready_to_receive: values.ready_to_receive,
+      cargo_types: values.cargo_types,
       description: values.description,
       sizes: values.sizes,
     });
   };
-  const getOrder = async () => {
+  const getOrder = async () => {  
+    await setOrderLoading(true);
     if (orderId) {
       const order = await ordersApi.getOrders({ orderId: orderId });
       //TODO check if can be edited
@@ -139,6 +145,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         setFieldsValue(orderData);
       }
     }
+    await setOrderLoading(false);
   };
 
   const getTitle = useMemo(() => {
@@ -160,17 +167,25 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
     if (mode === FormModes.EDIT && orderId) {
       getOrder();
     }
+    const getCargoTypes = async () => {
+      await setOrderLoading(true);
+      const cargoTypes = await ordersApi.getCargoTypes();
+      setCargoTypes(cargoTypes);
+      await setOrderLoading(false);
+    }
+    getCargoTypes();
   }, [mode, orderId]);
 
   return (
     <div>
       <Title level={2}>{getTitle}</Title>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        autoComplete="off"
-      >
+      <Spin spinning={orderLoading} indicator={<LoadingOutlined style={{ fontSize: 72 }} spin />}>  
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          autoComplete="off"
+        >
         <div
           style={{
             display: "grid",
@@ -449,6 +464,29 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
         )}
         {orderType === OrdersTypes.DELIVERY && (
           <Form.Item
+            name="cargo_types"
+            label={t("cargo-types")}
+            rules={[{ required: true, message: t("cargo-type-error") }]}
+          >
+            <Select
+              size="large"
+              mode="multiple"
+              allowClear
+              style={{ width: "100%", textAlign: "left" }}
+              placeholder={t("cargo-type-placeholder")}
+              defaultValue={[]}
+              showSearch={false}
+              placement="topLeft"
+              options={cargoTypes.map((type) => ({
+                key: type.id,
+                value: type.id,
+                label: type[`name_${lang}`]
+              }))}
+            />
+          </Form.Item>
+        )}
+        {orderType === OrdersTypes.DELIVERY && (
+          <Form.Item
             name="ready_to_send"
             valuePropName="checked"
             style={{ textAlign: "left" }}
@@ -516,7 +554,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ type, mode, orderId }) => {
             </Popconfirm>
           )}
         </Form.Item>
-      </Form>
+    </Form>
+    </Spin>
     </div>
   );
 };
