@@ -3,9 +3,13 @@ import { Menu } from "antd";
 import { useNavigate } from "react-router-dom";
 import BottomMenu from "../components/BottomMenu";
 import { SendIcon, TruckIcon } from "lucide-react";
+import { GlobalContext } from "../main";
+import { useContext } from "react";
 const MainPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { webApp } = useContext(GlobalContext);
+  const user = webApp?.initDataUnsafe?.user;
   const items = [
     {
       key: 'send',
@@ -49,7 +53,7 @@ const MainPage = () => {
 
   return (
     <div className="page" >
-      <h2>{t("welcome")}</h2>
+      <h2>{t("welcome")}, {user?.first_name || user?.username}</h2>
         <Menu 
           mode="inline"
           items={items}
