@@ -47,7 +47,7 @@ const BottomMenu = () => {
         type="link"
         icon={<UserRoundIcon />}
         size="large"
-        onClick={() => navigate("/chat")}
+        // onClick={() => navigate("/chat")}
       ></Button>
       <Badge count={messagesCount}> 
       <Button
