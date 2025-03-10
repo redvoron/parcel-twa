@@ -80,5 +80,18 @@
   "sizes-placeholder": "Select sizes",
   "cargo-types": "Cargo types",
   "cargo-type-placeholder": "Select cargo types",
-  "cargo-type-error": "Select cargo types"
+  "cargo-type-error": "Select cargo types",
+  "self-service-pickup": "Self-service search for a parcel. Manager not needed",
+  "self-service-delivery": "Self-service search for a courier. Manager not needed",
+  "sizes-types": "Sizes types",
+  "exact-sizes": "Exact sizes",
+  "approximate-sizes": "Approximate sizes",
+  "order-created-delivery": "Delivery order created",
+  "order-created-pickup": "Transportation service created",
+  "order-updated-delivery": "Delivery order updated",
+  "order-updated-pickup": "Transportation service updated",
+  "order-create-error-delivery": "Error creating delivery order",
+  "order-create-error-pickup": "Error creating transportation service",
+  "order-update-error-delivery": "Error updating delivery order",
+  "order-update-error-pickup": "Error updating transportation service"
 }

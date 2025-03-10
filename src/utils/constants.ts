@@ -65,6 +65,7 @@ export enum AuthResultType {
 export enum FormModes {
   CREATE = "create",
   EDIT = "edit",
+  VIEW = "view",
 }
 export interface GlobalContextType {
   webApp: typeof WebApp;

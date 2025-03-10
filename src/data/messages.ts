@@ -7,13 +7,19 @@ export interface Message {
   data: Record<string, unknown> | null;
   sender_id: string;
   reciever_id: string;
+  is_read: boolean;
 }
-
+export interface MessageCount {
+  orderId: number;
+  total: number;
+  unread: number;
+}
 export interface CreateMessageParams {
   order_id: number;
   data?: Record<string, unknown>;
   sender_id: string;
   reciever_id: string;
+  is_read: boolean;
 }
 
 export const messagesApi = {
@@ -122,5 +128,65 @@ export const messagesApi = {
     return () => {
       subscription.unsubscribe();
     };
+  },
+
+  async readMessages(orderId: number, userId: string) {
+    const { data, error } = await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .eq('order_id', orderId)
+      .eq('reciever_id', userId)
+      .eq('is_read', false);
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getMessagesCount(orderId: number, userId: string) {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('count')
+      .eq('order_id', orderId)
+      .eq('reciever_id', userId)
+      .eq('is_read', false);
+
+    if (error) throw error;
+    return data[0].count;
+  },
+
+  async getMessagesCountForUser(userId: string): Promise<MessageCount[]> {
+    try {
+      // Получаем все сообщения и обрабатываем на клиенте
+      const { data: allMessages, error: messagesError } = await supabase
+        .from('messages')
+        .select('order_id, is_read')
+        .eq('reciever_id', userId);
+        
+      if (messagesError) throw messagesError;
+      
+      const messagesByOrder: Record<string, { total: number; unread: number }> = {};
+      
+      if (allMessages) {
+        allMessages.forEach((msg: { order_id: number; is_read: boolean }) => {
+          const orderId = String(msg.order_id);
+          if (!messagesByOrder[orderId]) {
+            messagesByOrder[orderId] = { total: 0, unread: 0 };
+          }
+          messagesByOrder[orderId].total += 1;
+          if (!msg.is_read) {
+            messagesByOrder[orderId].unread += 1;
+          }
+        });
+      }
+      
+      return Object.keys(messagesByOrder).map(orderId => ({
+        orderId: Number(orderId),
+        total: messagesByOrder[orderId].total,
+        unread: messagesByOrder[orderId].unread
+      }));
+    } catch (error) {
+      console.error('Error in getMessagesCountForUser:', error);
+      return [];
+    }
   },
 };

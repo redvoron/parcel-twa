@@ -1,5 +1,5 @@
 import supabase from "./supabaseClient";
-import { Lang, OrdersSizes, OrdersStatus, OrdersTypes } from "../utils/constants";
+import { Lang, OrdersStatus, OrdersTypes } from "../utils/constants";
 export type Order = {
   order_id: number
   type: OrdersTypes
@@ -8,6 +8,7 @@ export type Order = {
   action: OrdersStatus
   courier_id: string
   customer_id: string
+  creator_id: string
   data: OrderData,
   from_city_data?: City,
   to_city_data?: City
@@ -26,8 +27,10 @@ export type OrderData = {
   price?: number
   ready_to_send?: boolean
   ready_to_receive?: boolean,
-  sizes?: OrdersSizes[]
+  sizes?: number[]
   cargo_types?: number[]
+  cargo_type_description?: string
+  self_service?: boolean
 }
 
 export type OrderAction = {
@@ -69,6 +72,12 @@ export type CitySearchResult = {
 }
 
 export type CargoType = {
+  id: number
+  name_ru: string
+  name_en: string
+}
+
+export type SizesType = {
   id: number
   name_ru: string
   name_en: string
@@ -370,6 +379,18 @@ export const ordersApi = {
 
     if (error) {
       console.error('Error fetching cargo types:', error)
+      return []
+    }
+
+    return data
+  },
+  async getSizesTypes(): Promise<SizesType[]> {
+    const { data, error } = await supabase
+      .from('sizes_types')
+      .select('*')
+      
+    if (error) {
+      console.error('Error fetching sizes types:', error)
       return []
     }
 

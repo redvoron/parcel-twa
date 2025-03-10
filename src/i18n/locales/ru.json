@@ -77,8 +77,21 @@
   "size_suitcase_large": "Чемодан (до 30 кг)",
   "sizes_to_pickup": "Готов взять размеры",
   "sizes": "Размеры",
+  "sizes-types": "Типы размеров",
   "sizes-placeholder": "Выберите размеры",
   "cargo-types": "Типы грузов",
   "cargo-type-placeholder": "Выберите типы грузов",
-  "cargo-type-error": "Выберите типы грузов"
+  "cargo-type-error": "Выберите типы грузов",
+  "self-service-pickup": "Самостоятельный поиск посылки. Менеджер не нужен",
+  "self-service-delivery": "Самостоятельный поиск курьера. Менеджер не нужен",
+  "exact-sizes": "Точные размеры",
+  "approximate-sizes": "Примерные размеры",
+  "order-created-delivery": "Заявка на доставку создана",
+  "order-created-pickup": "Услуга перевозки создана",
+  "order-updated-delivery": "Заявка на доставку обновлена",
+  "order-updated-pickup": "Услуга перевозки обновлена",
+  "order-create-error-delivery": "Ошибка при создании заявки на доставку",
+  "order-create-error-pickup": "Ошибка при создании услуги перевозки",
+  "order-update-error-delivery": "Ошибка при обновлении заявки на доставку",
+  "order-update-error-pickup": "Ошибка при обновлении услуги перевозки"
 }

@@ -11,6 +11,14 @@ export const routes = {
     path: '/orders/edit/:orderId',
     name: 'orders-edit',
   },
+  orderView: {
+    path: '/orders/view/:orderId',
+    name: 'orders-view',
+  },
+  orderMessage: {
+    path: '/orders/message/:orderId',
+    name: 'orders-message',
+  },
   orderCreate: {
     path: '/orders/create/:type',
     name: 'orders-create',

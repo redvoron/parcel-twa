@@ -3,8 +3,9 @@ import { OrdersViewType } from "../utils/constants";
 import { GetOrdersParams } from "../data/orders";
 import { useNavigate, useParams } from "react-router-dom";
 import WebApp from "@twa-dev/sdk";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import BottomMenu from "../components/BottomMenu";
+import { GlobalContext } from "../main";
 
 interface OrdersPageProps {
   type: OrdersViewType;
@@ -14,7 +15,12 @@ interface OrdersPageProps {
 const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const userContext = useContext(GlobalContext);
+  //TODO: remove mock userId
+  const currentUserId = userContext?.userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
   
+  const reqUserId = userId ? userId : currentUserId;
+
   useEffect(() => {
     WebApp.BackButton.show();
     WebApp.BackButton.onClick(() => {
@@ -27,7 +33,7 @@ const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
 
   return (
     <div className="page">
-      <OrdersTable viewType={type} userId={userId} extraParams={extraParams} />
+      <OrdersTable viewType={type} userId={reqUserId} extraParams={extraParams} />
       <BottomMenu />
     </div>
   );
