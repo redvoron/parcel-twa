@@ -12,7 +12,6 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "@twa-dev/sdk": "^6.7.1",
-    "@vitejs/plugin-basic-ssl": "^1.0.1",
     "antd": "^5.23.3",
     "axios": "^1.7.9",
     "i18next": "^24.2.2",
@@ -33,6 +32,7 @@
     "@types/react-world-flags": "^1.6.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-basic-ssl": "^2.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
