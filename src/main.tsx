@@ -92,7 +92,7 @@ function Root() {
       </Flex>
     );
   }
-  console.log(window.location.pathname);
+
   return (
     <GlobalContext.Provider value={context}>
       <ConfigProvider theme={telegramTheme}>

@@ -5,7 +5,7 @@ import OrdersPage from "./pages/OrdersPage";
 import { FormModes, OrdersViewType } from "./utils/constants";
 import { routes } from "./utils/routes";
 import OrderPage from "./pages/OrderPage";
-
+import ChatPage from "./pages/ChatPage";
 function App() {
   return (
     <BrowserRouter basename="/parcel-twa">
@@ -18,7 +18,7 @@ function App() {
         <Route path={routes.orderEdit.path} element={<OrderPage mode={FormModes.EDIT} />} />
         <Route path={routes.orderCreate.path} element={<OrderPage mode={FormModes.CREATE} />} />
         <Route path={routes.orderView.path} element={<OrderPage mode={FormModes.VIEW} />} />
-        
+        <Route path={routes.chat.path} element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
   );

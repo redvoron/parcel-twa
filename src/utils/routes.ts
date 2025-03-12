@@ -40,7 +40,7 @@ export const routes = {
     name: 'deliver',
   },
   chat: {
-    path: '/chat/:chatId',
+    path: '/chat/:orderId/:userId',
     name: 'chat',
   },
 };

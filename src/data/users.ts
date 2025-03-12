@@ -114,3 +114,11 @@ export const authenticateUser = async (
     };
   }
 };
+
+export const getUserProfile = async (userId: string) => {
+    const { data, error } = await supabase.from("users").select("*").eq("auth_id", userId).single();
+    if (error) {
+        console.error("Error getting profiles:", error);
+    }
+    return data;
+};

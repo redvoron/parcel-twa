@@ -93,5 +93,6 @@
   "order-create-error-delivery": "Error creating delivery order",
   "order-create-error-pickup": "Error creating transportation service",
   "order-update-error-delivery": "Error updating delivery order",
-  "order-update-error-pickup": "Error updating transportation service"
+  "order-update-error-pickup": "Error updating transportation service",
+  "conversations": "Conversations"
 }

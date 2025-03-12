@@ -18,7 +18,7 @@ const OrderPage = ({ mode }: { mode: FormModes }) => {
       WebApp.BackButton.hide();
     };
   }, [navigate]);
-
+  
   return (
     <div className="page">
       {mode === FormModes.VIEW && orderId ? (
