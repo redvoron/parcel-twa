@@ -1,11 +1,11 @@
 import i18n from "./i18n";
 import React, { createContext, useEffect, useState } from "react";
-import { ConfigProvider, Flex, Spin, FloatButton, Modal } from "antd";
+import { ConfigProvider, Flex, Spin, Modal } from "antd";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import WebApp from "@twa-dev/sdk";
-import { LoadingOutlined, UserOutlined } from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import { authenticateUser } from "./data/users.ts";
 import {
   AuthResultType,
@@ -45,9 +45,9 @@ function Root() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = () => {
+/*   const showModal = () => {
     setIsModalOpen(true);
-  };
+  }; */
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -99,11 +99,11 @@ function Root() {
           <App />
           {isDev && (
             <>
-              <FloatButton
+{/*               <FloatButton
                 icon={<UserOutlined />}
                 onClick={showModal}
                 style={{ position: "absolute", top: 10, right: 10 }}
-              />
+              /> */}
               <Modal
                 title="User info"
                 open={isModalOpen}

@@ -24,7 +24,10 @@ export type OrderData = {
   height?: number
   length?: number
   description?: string
-  price?: number
+  price?: {
+    value: number
+    currency: string
+  }
   ready_to_send?: boolean
   ready_to_receive?: boolean,
   sizes?: number[]
@@ -285,6 +288,8 @@ export const ordersApi = {
     if (userId) {
       queryOr.push(`customer_id.eq.${userId},courier_id.eq.${userId}`);
       // query = query.or(`customer_id.eq.${userId},courier_id.eq.${userId}`);
+    } else {
+      query = query.gt('data->>from_date', new Date().toISOString());
     }
 
     if (role) {

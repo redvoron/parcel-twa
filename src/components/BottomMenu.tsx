@@ -1,6 +1,6 @@
 import { Badge, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { MessageCircleMore, HomeIcon, UserRoundIcon } from "lucide-react";
+import { HomeIcon, UserRoundIcon } from "lucide-react";
 import { useEffect, useState, useContext } from "react";
 import { messagesApi } from "../data/messages";
 import { GlobalContext } from "../main";
@@ -41,19 +41,30 @@ const BottomMenu = () => {
         color="primary"
         variant="link"
         onClick={() => navigate("/")}
-      ></Button>
-      <Button
+        style={{
+          outline: "none",
+          backgroundColor: "transparent"
+        }}
+        className="no-hover"
+      />
+{/*       <Button
         type="link"
         icon={<UserRoundIcon />}
         size="large"
+        style={{outline: "none"}}
         // onClick={() => navigate("/chat")}
-      ></Button>
+      ></Button> */}
       <Badge count={messagesCount}>
         <Button
           type="link"
-          icon={<MessageCircleMore />}
+          icon={<UserRoundIcon />}
           onClick={() => navigate("/orders/my")}
-        ></Button>
+          style={{
+            outline: "none",
+            backgroundColor: "transparent"
+          }}
+          className="no-hover"
+        />
       </Badge>
     </div>
   );

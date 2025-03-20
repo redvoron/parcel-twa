@@ -15,6 +15,11 @@ const gridStyleHalf: React.CSSProperties = {
   textAlign: "left",
 };
 
+const gridStyleFull: React.CSSProperties = {
+  width: "100%",
+  textAlign: "left",
+};
+
 const OrderView = ({ orderId }: { orderId: number }) => {
   const { t } = useTranslation();
   const { userContext } = useContext(GlobalContext);
@@ -83,15 +88,22 @@ const OrderView = ({ orderId }: { orderId: number }) => {
           </p>
           <p>{dayjs(order?.data.to_date).format("DD.MM.YYYY")}</p>
         </Card.Grid>
+        {order?.data.price?.value && (
+          <Card.Grid style={gridStyleFull}>
+            <b>{t("price")}:</b> {order?.data.price?.value} {order?.data.price?.currency}
+          </Card.Grid>
+        )}
       </Card>
-      <Divider />
+
       {conversations && conversations.length > 0 && (
-        <List
-          header={t("conversations")}
-          bordered
-          loading={loading}
-          dataSource={conversations}
-          renderItem={(item) => (
+        <>
+          <Divider />
+          <List
+            header={t("conversations")}
+            bordered
+            loading={loading}
+            dataSource={conversations}
+            renderItem={(item) => (
             <List.Item key={item.userId}>
               <Link
                 to={`/chat/${orderId}/${item.userId}`}
@@ -109,8 +121,9 @@ const OrderView = ({ orderId }: { orderId: number }) => {
                 </span>
               </Link>
             </List.Item>
-          )}
-        />
+            )}
+          />
+        </>
       )}
     </div>
   );

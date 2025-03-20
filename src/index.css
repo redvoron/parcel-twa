@@ -107,3 +107,14 @@ input, select, textarea, label {
   }
 }
 
+.no-hover:hover,
+.no-hover:active,
+.no-hover:focus {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-color: transparent !important;
+}
+
+.no-hover::after {
+  display: none !important;
+}

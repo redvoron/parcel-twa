@@ -13,6 +13,7 @@ import {
   MessageCircleMore,
   Pencil,
   Plane,
+  RefreshCcw,
 } from "lucide-react";
 import {
   OrdersStatus,
@@ -21,7 +22,7 @@ import {
   OrdersTableColumns,
   Lang,
 } from "../utils/constants";
-import { Space, Table, Tag, Button, Badge } from "antd";
+import { Space, Table, Tag, Button, Badge, Input } from "antd";
 import type { TableProps } from "antd";
 import Title from "antd/es/typography/Title";
 import Flag from "react-world-flags";
@@ -33,6 +34,7 @@ export type OrdersTableProps = {
   userId?: string;
   extraParams?: GetOrdersParams;
 };
+
 
 const DEFAULT_VISIBLE_COLUMNS = [
   //OrdersTableColumns.CREATED_AT,
@@ -57,6 +59,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     DEFAULT_VISIBLE_COLUMNS
   );
   const lang: Lang = userContext?.lang || Lang.RU;
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState<Order[]>([]);
 
   const ordersColumns: TableProps<Order>["columns"] = [
     {
@@ -180,6 +184,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       hidden: !visibleColumns.includes(OrdersTableColumns.ACTION),
       render: (_text, record: Order) => {
         const isMyOrder = record.creator_id === userId;
+        const hasPrice = record.data.price?.value;
         const orderMessagesCountUnread =
           messagesCount.find((message) => message.orderId === record.order_id)
             ?.unread || 0;
@@ -189,7 +194,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
         const canBeEditable =
           viewType === OrdersViewType.MY &&
           record.action === OrdersStatus.CREATED &&
-          !orderMessagesCountTotal;
+          !orderMessagesCountTotal && !hasPrice;
         return (
           <Space direction="vertical" data-column="actions">
             {viewType !== OrdersViewType.MY &&
@@ -306,7 +311,32 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
 
   return (
     <>
+      <Button
+        icon={<RefreshCcw />}
+        onClick={getData}
+        loading={loading}
+        color="primary"
+        style={{ position: "absolute", left: 10, top: 10 }}
+      />
       <Title level={2}>{getTableHeader}</Title>
+      <Input.Search
+        placeholder={t('search')}
+        allowClear
+        onSearch={(value) => {
+          setSearchText(value);
+          // Если используете antd Table
+          const filteredData = data.filter(record => {
+            console.log(record);
+
+            return record.from_city_data?.name_ru.toLowerCase().includes(value.toLowerCase()) || 
+            record.to_city_data?.name_ru.toLowerCase().includes(value.toLowerCase()) || 
+            record.from_city_data?.name_en.toLowerCase().includes(value.toLowerCase()) || 
+            record.to_city_data?.name_en.toLowerCase().includes(value.toLowerCase());
+          });
+          setFilteredData(filteredData);
+        }}
+        style={{ marginBottom: 16, width: 200 }}
+      />
       <Table
         columns={ordersColumns}
         expandable={{
@@ -374,7 +404,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
             }
           },
         }}
-        dataSource={data}
+        dataSource={searchText ? filteredData : data}
         loading={loading}
         rowKey={(record) => record.order_id}
         scroll={{ x: "max-content", y: "calc(100vh - 246px)" }}

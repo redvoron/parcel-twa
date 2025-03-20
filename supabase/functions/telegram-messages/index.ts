@@ -73,7 +73,7 @@ Deno.serve(async () => {
       try {
         if (group.reciever_telegram_id) {
           // Отправляем уведомление в Telegram
-          const appLink = `${APP_URL}?start_param=order_${group.order_id}`
+          const appLink = `${APP_URL}?startapp=order_${group.order_id}`
           const messageText = MESSAGE_TEXT[group.reciever_lang].replace('{link}', appLink).replace('{order_id}', group.order_id.toString())
           await fetch(`${TELEGRAM_API}/sendMessage`, {
             method: 'POST',
