@@ -13,7 +13,7 @@ import {
   Lang,
   UserContext,
 } from "./utils/constants";
-import { useNavigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 const isDev = true;
 const defaultUserContext: UserContext = {
   lang: Lang.EN,
@@ -44,7 +44,6 @@ function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -59,7 +58,6 @@ function Root() {
   };
 
   useEffect(() => {
-    let orderId = '';
     const initApp = async () => {
       try {
         const telegramUserData = await authenticateUser(WebApp.initData);
@@ -76,17 +74,10 @@ function Root() {
           const lang = WebApp.initDataUnsafe.user?.language_code as Lang;
           i18n.changeLanguage(lang);
           userContext.lang = lang;
-          const orderIdInParams = WebApp.initDataUnsafe.start_param?.split('_')[1];
-          if (orderIdInParams) {
-            orderId = orderIdInParams;
-          }
         }
         setContext({ webApp: WebApp, userContext });
       } finally {
         setIsLoading(false);
-        if (orderId) {
-          navigate(`/orders/view/${orderId}`);
-        }
       }
     };
 
@@ -102,25 +93,31 @@ function Root() {
   }
 
   return (
-    <GlobalContext.Provider value={context}>
-      <ConfigProvider theme={telegramTheme}>
-        <App />
-        {isDev && (
-          <>
-            <FloatButton icon={<UserOutlined />} onClick={showModal} style={{ position: 'absolute', top: 10, right: 10 }}/>
-            <Modal
-              title="User info"
-              open={isModalOpen}
-              onOk={handleOk}
-              onCancel={handleCancel}
-          >
-            {JSON.stringify(context.userContext)}
-            {JSON.stringify(context.webApp)}
-            </Modal>
-          </>
-        )}
-      </ConfigProvider>
-    </GlobalContext.Provider>
+    <BrowserRouter basename="/parcel-twa">
+      <GlobalContext.Provider value={context}>
+        <ConfigProvider theme={telegramTheme}>
+          <App />
+          {isDev && (
+            <>
+              <FloatButton
+                icon={<UserOutlined />}
+                onClick={showModal}
+                style={{ position: "absolute", top: 10, right: 10 }}
+              />
+              <Modal
+                title="User info"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+              >
+                {JSON.stringify(context.userContext)}
+                {JSON.stringify(context.webApp)}
+              </Modal>
+            </>
+          )}
+        </ConfigProvider>
+      </GlobalContext.Provider>
+    </BrowserRouter>
   );
 }
 
