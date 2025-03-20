@@ -9,7 +9,10 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
-
+const MESSAGE_TEXT = {
+  en: 'You have <a href="{link}">new unread messages</a>',
+  ru: 'У вас есть <a href="{link}">новые непрочитанные сообщения</a>',
+}
 Deno.serve(async () => {
   try {
     // Получаем непрочитанные сообщения старше 15 минут
@@ -23,7 +26,7 @@ Deno.serve(async () => {
         is_read,
         notifications_sent,
         created_at,
-        sender:users!sender_id(username, first_name, last_name),
+        sender:users!sender_id(username, first_name, last_name, meta),
         reciever:users!reciever_id(telegram_id)
       `)
       .eq('is_read', false)
@@ -43,6 +46,7 @@ Deno.serve(async () => {
           sender_id: message.sender_id,
           reciever_id: message.reciever_id,
           reciever_telegram_id: message.reciever.telegram_id,
+          reciever_lang: message.reciever.meta?.user?.language_code || 'en',
           count: 0,
           sender_name: message.sender.username || 
             `${message.sender.first_name} ${message.sender.last_name}`.trim()
@@ -64,15 +68,16 @@ Deno.serve(async () => {
     // Обрабатываем каждую группу сообщений
     for (const group of Object.values(groupedMessages)) {
       try {
-
         if (group.reciever_telegram_id) {
           // Отправляем уведомление в Telegram
+          const appLink = `${Deno.env.get('APP_URL')}?start_param=order_${group.order_id}`
+          const messageText = MESSAGE_TEXT[group.reciever_lang].replace('{link}', appLink)
           await fetch(`${TELEGRAM_API}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              chat_id: group.reciever_telegram_id, //TODO: update text, add english
-              text: `У вас ${group.count} непрочитанных сообщений в заказе #${group.order_id}\nОт пользователя: ${group.sender_name}`,
+              chat_id: group.reciever_telegram_id, 
+              text: messageText,
               parse_mode: 'HTML'
             })
           })
