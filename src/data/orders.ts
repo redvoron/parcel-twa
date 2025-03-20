@@ -49,7 +49,8 @@ export interface GetOrdersParams {
   type?: OrdersTypes,
   userId?: string,
   role?: OrdersTypes,
-  orderId?: number
+  orderId?: number,
+  ordersWithMessagesIds?: string[]
 }
 
 export type City = {
@@ -260,13 +261,15 @@ export const ordersApi = {
     type,
     userId,
     role,
-    orderId
+    orderId,
+    ordersWithMessagesIds
   }: GetOrdersParams): Promise<{ data: Order[]; total: number; ordersTypes: OrdersTypes[]; ordersStatuses: OrdersStatus[] }> {
     let query = supabase
       .from('orders_full')
       .select('*', { count: 'exact' })
       .order(sortBy, { ascending: sortOrder === 'asc' });
 
+    const queryOr = [];
     if (page && pageSize) {
       query = query.range((page - 1) * pageSize, page * pageSize - 1);
     }
@@ -280,7 +283,8 @@ export const ordersApi = {
     }
 
     if (userId) {
-      query = query.or(`customer_id.eq.${userId},courier_id.eq.${userId}`);
+      queryOr.push(`customer_id.eq.${userId},courier_id.eq.${userId}`);
+      // query = query.or(`customer_id.eq.${userId},courier_id.eq.${userId}`);
     }
 
     if (role) {
@@ -289,6 +293,14 @@ export const ordersApi = {
 
     if (orderId) {
       query = query.eq('order_id', orderId);
+    }
+
+    if (ordersWithMessagesIds && ordersWithMessagesIds.length > 0) {
+      queryOr.push(`order_id.in.(${ordersWithMessagesIds.join(',')})`);
+    }
+
+    if (queryOr.length > 0) {
+      query = query.or(queryOr.join(','));
     }
 
     if (filters?.length) {

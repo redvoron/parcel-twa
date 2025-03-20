@@ -34,12 +34,10 @@ const OrderView = ({ orderId }: { orderId: number }) => {
 
   const getOrder = async () => {
     setLoading(true);
-    const getConverstions = async (creatorId: string) => {
-      const isMyOrder = creatorId === userId;
+    const getConverstions = async () => {
       const conversations = await messagesApi.getConversations(
         userId,
         orderId,
-        isMyOrder
       );
       setConversations(conversations);
     };
@@ -48,7 +46,7 @@ const OrderView = ({ orderId }: { orderId: number }) => {
       //TODO check if can be edited
       const orderData = order?.data[0];
       setOrder(orderData);
-      await getConverstions(orderData?.creator_id);
+      await getConverstions();
     }
 
     setLoading(false);

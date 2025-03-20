@@ -87,7 +87,7 @@ export const messagesApi = {
     return data;
   },
 
-  async getConversations(userId: string, orderId: number, isMyOrder: boolean) {
+  async getConversations(userId: string, orderId: number) {
     // Получаем сообщения и связанные данные пользователей
     const { data, error } = await supabase
       .from('messages')
@@ -100,7 +100,7 @@ export const messagesApi = {
         sender:sender_id(username, first_name, last_name, avatar_url),
         reciever:reciever_id(username, first_name, last_name, avatar_url)
       `)
-      .eq(isMyOrder ? 'reciever_id' : 'sender_id', userId)
+      .or(`reciever_id.eq.${userId},sender_id.eq.${userId}`)
       .eq('order_id', orderId);
       
     if (error) throw error;
@@ -195,7 +195,7 @@ export const messagesApi = {
     };
   },
 
-  async readMessages(orderId: number, userId: string) {
+  async readMessages(orderId: string, userId: string) {
     const { data, error } = await supabase
       .from('messages')
       .update({ is_read: true })
@@ -254,7 +254,7 @@ export const messagesApi = {
       return [];
     }
   },
-
+  
   async getUnreadMessagesByOrder(orderId: number) {
     const { data, error } = await supabase
       .from('messages')

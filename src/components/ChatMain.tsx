@@ -4,6 +4,7 @@ import { GlobalContext } from "../main";
 import Chat from "./Chat";
 import { getUserProfile } from "../data/users";
 
+const MESSAGE_READ_INTERVAL = 10000;
 const ChatMain = ({ companionId, orderId }: { companionId?: string; orderId?: string }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const { userContext } = useContext(GlobalContext);
@@ -46,13 +47,23 @@ const ChatMain = ({ companionId, orderId }: { companionId?: string; orderId?: st
     setUserProfiles(users);
   };
 
+  const readMessages = async () => {
+    if (!orderId || !userId) {
+      return;
+    }
+    await messagesApi.readMessages(orderId, userId);
+  };
 
   useEffect(() => {
     if (userId && orderId && companionId) {
       getMessages();
+      readMessages();
       getUserProfiles();
       const unsubscribe =     messagesApi.subscribeToUserMessagesForOrder(orderId, userId, companionId, (message) => {
         setMessages((prevMessages) => [...prevMessages, message]);
+        setTimeout(() => {
+          readMessages();
+        }, MESSAGE_READ_INTERVAL);
       });
       return () => unsubscribe();
     }

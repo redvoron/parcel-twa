@@ -180,23 +180,27 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       hidden: !visibleColumns.includes(OrdersTableColumns.ACTION),
       render: (_text, record: Order) => {
         const isMyOrder = record.creator_id === userId;
-        // TODO Check messages
-        const hasMessages = messagesCount.some(
-          (message) => message.orderId === record.order_id && message.unread > 0
-        );
+        const orderMessagesCountUnread =
+          messagesCount.find((message) => message.orderId === record.order_id)
+            ?.unread || 0;
+        const orderMessagesCountTotal =
+          messagesCount.find((message) => message.orderId === record.order_id)
+            ?.total || 0;
         const canBeEditable =
           viewType === OrdersViewType.MY &&
           record.action === OrdersStatus.CREATED &&
-          !hasMessages;
+          !orderMessagesCountTotal;
         return (
           <Space direction="vertical" data-column="actions">
-            {viewType !== OrdersViewType.MY && !isMyOrder && (
-              <Button
-                type="link"
-                icon={<MessageCircleMore />}
-                onClick={(e) => onMessageClick(record, e)}
-              />
-            )}
+            {viewType !== OrdersViewType.MY &&
+              !isMyOrder &&
+              !orderMessagesCountTotal && (
+                <Button
+                  type="link"
+                  icon={<MessageCircleMore />}
+                  onClick={(e) => onMessageClick(record, e)}
+                />
+              )}
             {canBeEditable && (
               <Button
                 type="link"
@@ -204,15 +208,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                 onClick={(e) => onEditClick(record, e)}
               />
             )}
-            {!canBeEditable && isMyOrder && (
-              <Badge
-                size="small"
-                count={
-                  messagesCount.find(
-                    (message) => message.orderId === record.order_id
-                  )?.unread || 0 
-                }
-              >
+            {((!canBeEditable && isMyOrder) || orderMessagesCountTotal > 0) && (
+              <Badge size="small" count={orderMessagesCountUnread}>
                 <Button
                   type="link"
                   icon={<Eye />}
@@ -253,6 +250,12 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     if (userId) {
       const messagesCount = await messagesApi.getMessagesCountForUser(userId);
       setMessagesCount(messagesCount);
+      if (viewType === OrdersViewType.MY) {
+        const ordersWithMessagesIds = messagesCount.map((message) =>
+          message.orderId.toString()
+        );
+        getOrdersTableParams.ordersWithMessagesIds = ordersWithMessagesIds;
+      }
     }
   };
   const onMessageClick = (record: Order, e: React.MouseEvent<HTMLElement>) => {
@@ -279,7 +282,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   };
 
   const getData = async () => {
-    setLoading(true);
+    await setLoading(true);
+    await getMessagesCount();
     const data = await ordersApi.getOrders(getOrdersTableParams);
     setData(data.data);
     setOrdersTypes(data.ordersTypes);
@@ -289,7 +293,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     const sizesTypes = await ordersApi.getSizesTypes();
     setSizesTypes(sizesTypes);
     changeVisibleColumns();
-    getMessagesCount();
+
     setLoading(false);
   };
   const getTableHeader = useMemo(() => {
