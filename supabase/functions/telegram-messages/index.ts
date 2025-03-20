@@ -2,16 +2,19 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`
+const APP_URL = Deno.env.get('APP_URL')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-const MESSAGE_READ_INTERVAL_MAX = 1000 * 60 * 1;
+const MESSAGE_READ_INTERVAL_MAX = 1000 * 60 * 15;
 
 const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  SUPABASE_URL ?? '',
+  SUPABASE_SERVICE_ROLE_KEY ?? ''
 )
 const MESSAGE_TEXT = {
-  en: 'You have <a href="{link}">new unread messages</a>',
-  ru: 'У вас есть <a href="{link}">новые непрочитанные сообщения</a>',
+  en: 'You have <a href="{link}">new unread messages</a> for order №{order_id}',
+  ru: 'У вас есть <a href="{link}">новые непрочитанные сообщения</a> для заказа №{order_id}',
 }
 Deno.serve(async () => {
   try {
@@ -70,8 +73,8 @@ Deno.serve(async () => {
       try {
         if (group.reciever_telegram_id) {
           // Отправляем уведомление в Telegram
-          const appLink = `${Deno.env.get('APP_URL')}?start_param=order_${group.order_id}`
-          const messageText = MESSAGE_TEXT[group.reciever_lang].replace('{link}', appLink)
+          const appLink = `${APP_URL}?start_param=order_${group.order_id}`
+          const messageText = MESSAGE_TEXT[group.reciever_lang].replace('{link}', appLink).replace('{order_id}', group.order_id.toString())
           await fetch(`${TELEGRAM_API}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
