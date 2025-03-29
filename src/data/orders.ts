@@ -96,7 +96,7 @@ export const ordersApi = {
   ): Promise<Order | null> {
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({ type: type, data: orderData })
+      .insert({ type: type, data: orderData, creator_id: userId })
       .select()
       .single()
 
@@ -271,7 +271,6 @@ export const ordersApi = {
       .from('orders_full')
       .select('*', { count: 'exact' })
       .order(sortBy, { ascending: sortOrder === 'asc' });
-
     const queryOr = [];
     if (page && pageSize) {
       query = query.range((page - 1) * pageSize, page * pageSize - 1);
@@ -287,8 +286,7 @@ export const ordersApi = {
 
     if (userId) {
       queryOr.push(`customer_id.eq.${userId},courier_id.eq.${userId}`);
-      // query = query.or(`customer_id.eq.${userId},courier_id.eq.${userId}`);
-    } else {
+    } else if(!orderId) {
       query = query.gt('data->>from_date', new Date().toISOString());
     }
 

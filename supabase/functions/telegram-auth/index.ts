@@ -182,6 +182,7 @@ Deno.serve(async (req) => {
     }
     authUserId = newUser?.user?.id;
     await supabase.from("users").insert({
+      id: authUserId,
       auth_id: authUserId,
       telegram_id: telegramId,
       username,

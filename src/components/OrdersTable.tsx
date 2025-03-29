@@ -35,7 +35,6 @@ export type OrdersTableProps = {
   extraParams?: GetOrdersParams;
 };
 
-
 const DEFAULT_VISIBLE_COLUMNS = [
   //OrdersTableColumns.CREATED_AT,
   OrdersTableColumns.DESTINATION,
@@ -59,7 +58,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
     DEFAULT_VISIBLE_COLUMNS
   );
   const lang: Lang = userContext?.lang || Lang.RU;
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [filteredData, setFilteredData] = useState<Order[]>([]);
 
   const ordersColumns: TableProps<Order>["columns"] = [
@@ -194,31 +193,32 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
         const canBeEditable =
           viewType === OrdersViewType.MY &&
           record.action === OrdersStatus.CREATED &&
-          !orderMessagesCountTotal && !hasPrice;
+          !orderMessagesCountTotal &&
+          !hasPrice;
         return (
           <Space direction="vertical" data-column="actions">
-            {viewType !== OrdersViewType.MY &&
-              !isMyOrder &&
-              !orderMessagesCountTotal && (
+            {isMyOrder ? (
+              canBeEditable ? (
+                <Button
+                  type="link"
+                  icon={<Pencil />}
+                  onClick={(e) => onEditClick(record, e)}
+                />
+              ) : (
+                <Badge size="small" count={orderMessagesCountUnread}>
+                  <Button
+                    type="link"
+                    icon={<Eye />}
+                    onClick={(e) => onViewClick(record, e)}
+                  />
+                </Badge>
+              )
+            ) : (
+              <Badge size="small" count={orderMessagesCountUnread}>
                 <Button
                   type="link"
                   icon={<MessageCircleMore />}
                   onClick={(e) => onMessageClick(record, e)}
-                />
-              )}
-            {canBeEditable && (
-              <Button
-                type="link"
-                icon={<Pencil />}
-                onClick={(e) => onEditClick(record, e)}
-              />
-            )}
-            {((!canBeEditable && isMyOrder) || orderMessagesCountTotal > 0) && (
-              <Badge size="small" count={orderMessagesCountUnread}>
-                <Button
-                  type="link"
-                  icon={<Eye />}
-                  onClick={(e) => onViewClick(record, e)}
                 />
               </Badge>
             )}
@@ -265,7 +265,8 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
   };
   const onMessageClick = (record: Order, e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    navigate(`/orders/message/${record.order_id}`);
+
+    navigate(`/chat/${record.order_id}/${record.creator_id}`);
   };
 
   const onEditClick = (record: Order, e: React.MouseEvent<HTMLElement>) => {
@@ -320,18 +321,27 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       />
       <Title level={2}>{getTableHeader}</Title>
       <Input.Search
-        placeholder={t('search')}
+        placeholder={t("search")}
         allowClear
         onSearch={(value) => {
           setSearchText(value);
           // Если используете antd Table
-          const filteredData = data.filter(record => {
-            console.log(record);
+          const filteredData = data.filter((record) => {
 
-            return record.from_city_data?.name_ru.toLowerCase().includes(value.toLowerCase()) || 
-            record.to_city_data?.name_ru.toLowerCase().includes(value.toLowerCase()) || 
-            record.from_city_data?.name_en.toLowerCase().includes(value.toLowerCase()) || 
-            record.to_city_data?.name_en.toLowerCase().includes(value.toLowerCase());
+            return (
+              record.from_city_data?.name_ru
+                .toLowerCase()
+                .includes(value.toLowerCase()) ||
+              record.to_city_data?.name_ru
+                .toLowerCase()
+                .includes(value.toLowerCase()) ||
+              record.from_city_data?.name_en
+                .toLowerCase()
+                .includes(value.toLowerCase()) ||
+              record.to_city_data?.name_en
+                .toLowerCase()
+                .includes(value.toLowerCase())
+            );
           });
           setFilteredData(filteredData);
         }}
@@ -339,6 +349,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
       />
       <Table
         columns={ordersColumns}
+        style={{zIndex: 200}}
         expandable={{
           expandedRowRender: (record) => {
             const description = record.data.description || t("no_description");
