@@ -229,7 +229,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
               <Select
                 options={cities.map((city) => ({
                   key: city.id,
-                  value: city.city_ru,
+                  value: city[`city_${lang}`],
                 }))}
                 size="large"
                 showSearch
@@ -271,7 +271,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
               <Select
                 options={cities.map((city) => ({
                   key: city.id,
-                  value: city.city_ru,
+                  value: city[`city_${lang}`],
                 }))}
                 showSearch
                 filterOption={false}
