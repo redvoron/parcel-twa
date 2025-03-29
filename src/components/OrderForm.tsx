@@ -47,7 +47,8 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [orderLoading, setOrderLoading] = useState<boolean>(false);
   const [cargoTypes, setCargoTypes] = useState<CargoType[]>([]);
   const [sizesTypes, setSizesTypes] = useState<SizesType[]>([]);
-  const [isExactSizes, setIsExactSizes] = useState<boolean>(true);
+  const [isExactSizes, setIsExactSizes] = useState<boolean>(false);
+  const [isNeedCargoTypeDescription, setIsNeedCargoTypeDescription] = useState<boolean>(false);
   const { userContext } = useContext(GlobalContext);
   const navigate = useNavigate();
   const [orderType, setOrderType] = useState<OrdersTypes>(
@@ -144,6 +145,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
       ready_to_receive: values.ready_to_receive,
       self_service: values.self_service,
       cargo_types: values.cargo_types,
+      cargo_type_description: values.cargo_type_description,
       description: values.description,
       sizes: values.sizes,
     });
@@ -351,8 +353,8 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
             >
               <Segmented
                 options={[
-                  { label: t("exact-sizes"), value: true },
                   { label: t("approximate-sizes"), value: false },
+                  { label: t("exact-sizes"), value: true },
                 ]}
                 size="large"
                 value={isExactSizes}
@@ -549,6 +551,26 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   value: type.id,
                   label: type[`name_${lang}`],
                 }))}
+                onChange={(value) => {
+                  const selectedTypes = value as number[];
+                  const hasTypeNeedingComment = selectedTypes.some(typeId => 
+                    cargoTypes.find(type => type.id === typeId)?.need_comment
+                  );
+                  setIsNeedCargoTypeDescription(hasTypeNeedingComment);
+                }}
+              />
+            </Form.Item>
+          )}
+          {isNeedCargoTypeDescription && (
+            <Form.Item
+              name="cargo_type_description"
+              label={t("cargo-type-description")}
+              rules={[{ required: true, message: t("cargo-type-description-error") }]}
+            >
+              <TextArea
+                rows={4}
+                placeholder={t("cargo-type-description-placeholder")}
+                size="large"
               />
             </Form.Item>
           )}

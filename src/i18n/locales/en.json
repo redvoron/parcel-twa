@@ -97,5 +97,8 @@
   "conversations": "Conversations",
   "search": "Search",
   "price": "Delivery cost",
-  "currency": "Currency"
+  "currency": "Currency",
+  "cargo-type-description": "Cargo type description",
+  "cargo-type-description-placeholder": "Describe the cargo type",
+  "cargo-type-description-error": "Please describe the cargo type"
 }

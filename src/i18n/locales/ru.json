@@ -97,5 +97,8 @@
   "conversations": "Переписка",
   "search": "Поиск",
   "price": "Стоимость доставки",
-  "currency": "Валюта"
+  "currency": "Валюта",
+  "cargo-type-description": "Описание типа груза",
+  "cargo-type-description-placeholder": "Опишите тип груза",
+  "cargo-type-description-error": "Пожалуйста, опишите тип груза"
 }

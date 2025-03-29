@@ -79,6 +79,7 @@ export type CargoType = {
   id: number
   name_ru: string
   name_en: string
+  need_comment: boolean
 }
 
 export type SizesType = {

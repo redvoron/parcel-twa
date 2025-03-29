@@ -115,6 +115,22 @@ export const authenticateUser = async (
   }
 };
 
+export const updateUsersPhone = async (userId: string, phone_number: string) => {
+  const { data, error } = await supabase.from("users").update({ phone_number }).eq("auth_id", userId);
+  if (error) {
+    console.error("Error updating user phone:", error);
+  }
+  return data;
+};
+
+export const updateUsersEmail = async (userId: string, email: string) => {
+  const { data, error } = await supabase.from("users").update({ email }).eq("auth_id", userId);
+  if (error) {
+    console.error("Error updating user email:", error);
+  }
+  return data;
+};
+
 export const getUserProfile = async (userId: string) => {
     const { data, error } = await supabase.from("users").select("*").eq("auth_id", userId).single();
     if (error) {
