@@ -5,7 +5,7 @@ import { useEffect, useState, useContext } from "react";
 import { messagesApi } from "../data/messages";
 import { GlobalContext } from "../main";
 
-const HELP_HAT_USERNAME = import.meta.env.VITE_HELP_HAT_USERNAME;
+const HELP_CHAT_USERNAME = import.meta.env.VITE_HELP_CHAT_USERNAME;
 const BottomMenu = () => {
   const [messagesCount, setMessagesCount] = useState(0);
   const { userContext } = useContext(GlobalContext);
@@ -14,7 +14,7 @@ const BottomMenu = () => {
   const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
 
   const handleTelegramChat = () => {
-    window.open(`https://t.me/${HELP_HAT_USERNAME}`, "_blank");
+    window.open(`https://t.me/${HELP_CHAT_USERNAME}`, "_blank");
   };
 
   useEffect(() => {
@@ -57,7 +57,11 @@ const BottomMenu = () => {
         type="link"
         icon={<HelpCircleIcon />}
         size="large"
-        style={{outline: "none"}}
+        style={{
+          outline: "none",
+          backgroundColor: "transparent"
+        }}
+        className="no-hover"
         onClick={handleTelegramChat}
       ></Button>
 
