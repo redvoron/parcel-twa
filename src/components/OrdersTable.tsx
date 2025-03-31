@@ -353,9 +353,11 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
         expandable={{
           expandedRowRender: (record) => {
             const description = record.data.description || t("no_description");
+            const recordSizes = typeof record.data.sizes === 'number' ? [record.data.sizes] : record.data.sizes || [];
+
             const sizes_info =
               record.type === OrdersTypes.PICKUP
-                ? record.data.sizes
+                ? recordSizes
                     ?.map((size) => t(`size_${size}`))
                     .join(", ") || ""
                 : record.data.weight &&
@@ -382,7 +384,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                 )
                 .join(", ") || "";
             const sizes_types_info =
-              record.data.sizes
+              recordSizes
                 ?.map(
                   (type) =>
                     sizesTypes.find((sizeType) => sizeType.id === type)?.[
