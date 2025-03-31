@@ -7,7 +7,7 @@ import "./index.css";
 import WebApp from "@twa-dev/sdk";
 import { RequestContactResponse } from "@twa-dev/types";
 import { LoadingOutlined } from "@ant-design/icons";
-import { authenticateUser, getUserProfile } from "./data/users.ts";
+import { authenticateUser, getUserProfile, updateUserPhoneByTelegramId } from "./data/users.ts";
 import {
   AuthResultType,
   GlobalContextType,
@@ -16,7 +16,6 @@ import {
 } from "./utils/constants";
 import { BrowserRouter } from "react-router-dom";
 
-// const EVENT_REQUEST_PHONE = "web_app_request_phone";
 const isDev = true;
 const defaultUserContext: UserContext = {
   lang: Lang.EN,
@@ -44,20 +43,22 @@ const telegramTheme = {
 };
 
 const requestPhone = async () => {
-/* const data = {
-  eventType: EVENT_REQUEST_PHONE,
- }
- if (typeof window !== 'undefined') {
-  console.log('try to post message', window?.parent);
-  window?.parent?.postMessage(JSON.stringify(data), "*");
-  window?.TelegramWebviewProxy?.postEvent(EVENT_REQUEST_PHONE, {});
- }  */
- await WebApp.requestContact(onContact);
+  await WebApp.requestContact(onContact);
 }
 
-const onContact = (access: boolean, response?: RequestContactResponse) => {
+const onContact = async (access: boolean, response?: RequestContactResponse) => {
   console.log('contact', access, response);
+  if (access && response && 'responseUnsafe' in response) {
+    const contact = response.responseUnsafe.contact as { phone_number: string; user_id: number };
+    const phoneNumber = contact.phone_number;
+    const telegramUserId = String(contact.user_id);
+    console.log('phoneNumber', phoneNumber, telegramUserId);
+    if (phoneNumber) {
+      await updateUserPhoneByTelegramId(telegramUserId, phoneNumber);
+    }
+  }
 }
+
 function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);

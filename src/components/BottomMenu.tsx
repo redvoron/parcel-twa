@@ -63,7 +63,7 @@ const BottomMenu = () => {
         }}
         className="no-hover"
         onClick={handleTelegramChat}
-      >h5</Button>
+      ></Button>
 
       <Badge count={messagesCount}>
         <Button
