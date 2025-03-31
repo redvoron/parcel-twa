@@ -27,6 +27,7 @@ export type OrderData = {
   price?: {
     value: number
     currency: string
+    planId?: number
   }
   ready_to_send?: boolean
   ready_to_receive?: boolean,
@@ -411,5 +412,19 @@ export const ordersApi = {
     }
 
     return data
+  },
+  async getPlan(planId: number): Promise<{name_ru: string, name_en: string}> {
+    const { data, error } = await supabase
+      .from('tariffs')
+      .select('name_ru, name_en')
+      .eq('id', planId)
+      .single()
+
+    if (error) {
+      console.error('Error fetching plans:', error)
+      return {name_ru: '', name_en: ''}
+    }
+
+    return {name_ru: data.name_ru, name_en: data.name_en}
   }
 }

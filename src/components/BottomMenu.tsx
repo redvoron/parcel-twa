@@ -1,16 +1,22 @@
 import { Badge, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { HomeIcon, UserRoundIcon } from "lucide-react";
+import { HomeIcon, UserRoundIcon, HelpCircleIcon } from "lucide-react";
 import { useEffect, useState, useContext } from "react";
 import { messagesApi } from "../data/messages";
 import { GlobalContext } from "../main";
 
+const HELP_HAT_USERNAME = import.meta.env.VITE_HELP_HAT_USERNAME;
 const BottomMenu = () => {
   const [messagesCount, setMessagesCount] = useState(0);
   const { userContext } = useContext(GlobalContext);
   const navigate = useNavigate();
   //TODO: remove mock userId
   const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
+
+  const handleTelegramChat = () => {
+    window.open(`https://t.me/${HELP_HAT_USERNAME}`, "_blank");
+  };
+
   useEffect(() => {
     const fetchMessagesCount = async () => {
       const countByOrders = await messagesApi.getMessagesCountForUser(userId);
@@ -47,13 +53,14 @@ const BottomMenu = () => {
         }}
         className="no-hover"
       />
-{/*       <Button
+      <Button
         type="link"
-        icon={<UserRoundIcon />}
+        icon={<HelpCircleIcon />}
         size="large"
         style={{outline: "none"}}
-        // onClick={() => navigate("/chat")}
-      ></Button> */}
+        onClick={handleTelegramChat}
+      ></Button>
+
       <Badge count={messagesCount}>
         <Button
           type="link"

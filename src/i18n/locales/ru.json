@@ -100,5 +100,6 @@
   "currency": "Валюта",
   "cargo-type-description": "Описание типа груза",
   "cargo-type-description-placeholder": "Опишите тип груза",
-  "cargo-type-description-error": "Пожалуйста, опишите тип груза"
+  "cargo-type-description-error": "Пожалуйста, опишите тип груза",
+  "plan": "Тариф"
 }

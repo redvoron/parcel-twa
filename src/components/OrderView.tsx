@@ -18,6 +18,9 @@ const gridStyleHalf: React.CSSProperties = {
 const gridStyleFull: React.CSSProperties = {
   width: "100%",
   textAlign: "left",
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
 };
 
 const OrderView = ({ orderId }: { orderId: number }) => {
@@ -26,6 +29,10 @@ const OrderView = ({ orderId }: { orderId: number }) => {
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [plan, setPlan] = useState<{ name_ru: string; name_en: string }>({
+    name_ru: "",
+    name_en: "",
+  });
   const lang = userContext?.lang || Lang.EN;
   //TODO: remove mock userId
   const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
@@ -40,10 +47,7 @@ const OrderView = ({ orderId }: { orderId: number }) => {
   const getOrder = async () => {
     setLoading(true);
     const getConverstions = async () => {
-      const conversations = await messagesApi.getConversations(
-        userId,
-        orderId,
-      );
+      const conversations = await messagesApi.getConversations(userId, orderId);
       setConversations(conversations);
     };
     if (orderId) {
@@ -52,6 +56,10 @@ const OrderView = ({ orderId }: { orderId: number }) => {
       const orderData = order?.data[0];
       setOrder(orderData);
       await getConverstions();
+      if (orderData?.data?.price?.planId) {
+        const plan = await ordersApi.getPlan(orderData?.data?.price?.planId);
+        setPlan(plan);
+      }
     }
 
     setLoading(false);
@@ -90,7 +98,15 @@ const OrderView = ({ orderId }: { orderId: number }) => {
         </Card.Grid>
         {order?.data.price?.value && (
           <Card.Grid style={gridStyleFull}>
-            <b>{t("price")}:</b> {order?.data.price?.value} {order?.data.price?.currency}
+            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <b>{t("price")}:</b> {order?.data.price?.value}{" "}
+              {order?.data.price?.currency}
+            </span>
+            {plan[`name_${lang}`] && (
+              <span>
+                <b>{t("plan")}:</b> {plan[`name_${lang}`]}
+              </span>
+            )}
           </Card.Grid>
         )}
       </Card>
@@ -104,23 +120,23 @@ const OrderView = ({ orderId }: { orderId: number }) => {
             loading={loading}
             dataSource={conversations}
             renderItem={(item) => (
-            <List.Item key={item.userId}>
-              <Link
-                to={`/chat/${orderId}/${item.userId}`}
-                style={{ display: "flex", alignItems: "center", gap: 10 }}
-              >
-                <Badge count={item.unreadCount}>
-                  <Avatar src={item.avatar} />
-                </Badge>
-                <span>
-                  {getUserTitle({
-                    username: item.username,
-                    first_name: item.firstName,
-                    last_name: item.lastName,
-                  })}
-                </span>
-              </Link>
-            </List.Item>
+              <List.Item key={item.userId}>
+                <Link
+                  to={`/chat/${orderId}/${item.userId}`}
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <Badge count={item.unreadCount}>
+                    <Avatar src={item.avatar} />
+                  </Badge>
+                  <span>
+                    {getUserTitle({
+                      username: item.username,
+                      first_name: item.firstName,
+                      last_name: item.lastName,
+                    })}
+                  </span>
+                </Link>
+              </List.Item>
             )}
           />
         </>

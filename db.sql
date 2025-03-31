@@ -83,6 +83,7 @@ create table public.tariffs (
   name_en text null,
   name_ru text null,
   weight_deps boolean null default true,
+  price_zar numeric null,
   constraint tariffs_pkey primary key (id)
 ) TABLESPACE pg_default;
 
@@ -171,5 +172,50 @@ begin
     c.name_ru ilike search_query || '%'
     or c.name_en ilike search_query || '%'
     order by c.population desc;
+end;
+$$ language plpgsql;
+
+create or replace function calculate_volumetric_weight(
+  width_cm numeric,
+  height_cm numeric,
+  length_cm numeric
+)
+returns numeric as $$
+begin
+  return (width_cm * height_cm * length_cm) / 6000;
+end;
+$$ language plpgsql;
+
+create or replace function calculate_price(
+  width_cm numeric,
+  height_cm numeric,
+  length_cm numeric,
+  tariff_id bigint
+)
+returns numeric as $$
+declare
+  tariff_record record;
+  volumetric_weight numeric;
+  final_price numeric;
+begin
+  -- Получаем информацию о тарифе
+  select * into tariff_record
+  from tariffs
+  where id = tariff_id;
+
+  if tariff_record is null then
+    raise exception 'Тариф с id % не найден', tariff_id;
+  end if;
+
+  -- Если тариф зависит от веса, используем объемный вес
+  if tariff_record.weight_deps then
+    volumetric_weight := calculate_volumetric_weight(width_cm, height_cm, length_cm);
+    final_price := tariff_record.price_zar * volumetric_weight;
+  else
+    -- Если не зависит от веса, возвращаем базовую цену
+    final_price := tariff_record.price_zar;
+  end if;
+
+  return final_price;
 end;
 $$ language plpgsql;
