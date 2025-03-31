@@ -5,6 +5,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import WebApp from "@twa-dev/sdk";
+import { RequestContactResponse } from "@twa-dev/types";
 import { LoadingOutlined } from "@ant-design/icons";
 import { authenticateUser, getUserProfile } from "./data/users.ts";
 import {
@@ -15,7 +16,7 @@ import {
 } from "./utils/constants";
 import { BrowserRouter } from "react-router-dom";
 
-const EVENT_REQUEST_PHONE = "web_app_request_phone";
+// const EVENT_REQUEST_PHONE = "web_app_request_phone";
 const isDev = true;
 const defaultUserContext: UserContext = {
   lang: Lang.EN,
@@ -42,18 +43,21 @@ const telegramTheme = {
   },
 };
 
-const requestPhone = () => {
-const data = {
+const requestPhone = async () => {
+/* const data = {
   eventType: EVENT_REQUEST_PHONE,
  }
  if (typeof window !== 'undefined') {
   console.log('try to post message', window?.parent);
   window?.parent?.postMessage(JSON.stringify(data), "*");
   window?.TelegramWebviewProxy?.postEvent(EVENT_REQUEST_PHONE, {});
- } 
-
+ }  */
+ await WebApp.requestContact(onContact);
 }
 
+const onContact = (access: boolean, response?: RequestContactResponse) => {
+  console.log('contact', access, response);
+}
 function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,8 +90,6 @@ function Root() {
           userContext.lang = lang;
         }
         if (WebApp.initDataUnsafe) {
-          const conntact = await WebApp.requestContact();
-          console.log('initDataUnsafe', WebApp.initDataUnsafe, WebApp.initData, conntact);
           const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
           if (!userDb?.phone_number) {
             requestPhone();
