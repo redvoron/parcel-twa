@@ -43,23 +43,21 @@ const telegramTheme = {
 };
 
 const requestPhone = () => {
- const data = {
+const data = {
   eventType: EVENT_REQUEST_PHONE,
  }
  if (typeof window !== 'undefined') {
   console.log('try to post message', window?.parent);
   window?.parent?.postMessage(JSON.stringify(data), "*");
   window?.TelegramWebviewProxy?.postEvent(EVENT_REQUEST_PHONE, {});
- }
+ } 
+
 }
 
 function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-/*   const showModal = () => {
-    setIsModalOpen(true);
-  }; */
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -69,10 +67,6 @@ function Root() {
     setIsModalOpen(false);
   };
 
-  const handlePhoneRequest = (event: MessageEvent) => {
-    const data = JSON.parse(event.data);
-    console.log('handlePhoneRequest', data);
-  }
   useEffect(() => {
     const initApp = async () => {
       try {
@@ -92,7 +86,7 @@ function Root() {
           userContext.lang = lang;
         }
         if (WebApp.initDataUnsafe) {
-          console.log('initDataUnsafe', WebApp.initDataUnsafe);
+          console.log('initDataUnsafe', WebApp.initDataUnsafe, WebApp.initData);
           const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
           if (!userDb?.phone_number) {
             requestPhone();
@@ -105,15 +99,6 @@ function Root() {
     };
 
     initApp();
-    if (typeof window !== "undefined") {
-      console.log('try to add event listener');
-        window.addEventListener("message", handlePhoneRequest);
-    }
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("message", handlePhoneRequest);
-      }
-    };
   }, []);
 
   if (isLoading) {
