@@ -47,12 +47,10 @@ const requestPhone = async () => {
 }
 
 const onContact = async (access: boolean, response?: RequestContactResponse) => {
-  console.log('contact', access, response);
   if (access && response && 'responseUnsafe' in response) {
     const contact = response.responseUnsafe.contact as { phone_number: string; user_id: number };
     const phoneNumber = contact.phone_number;
     const telegramUserId = String(contact.user_id);
-    console.log('phoneNumber', phoneNumber, telegramUserId);
     if (phoneNumber) {
       await updateUserPhoneByTelegramId(telegramUserId, phoneNumber);
     }
