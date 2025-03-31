@@ -6,7 +6,7 @@ import App from "./App.tsx";
 import "./index.css";
 import WebApp from "@twa-dev/sdk";
 import { LoadingOutlined } from "@ant-design/icons";
-import { authenticateUser } from "./data/users.ts";
+import { authenticateUser, getUserProfile } from "./data/users.ts";
 import {
   AuthResultType,
   GlobalContextType,
@@ -14,6 +14,9 @@ import {
   UserContext,
 } from "./utils/constants";
 import { BrowserRouter } from "react-router-dom";
+
+const EVENT_REQUEST_PHONE = "web_app_request_phone";
+const EVENT_PHONE_REQUEST_STATUS = "phone_requested";
 const isDev = true;
 const defaultUserContext: UserContext = {
   lang: Lang.EN,
@@ -40,11 +43,19 @@ const telegramTheme = {
   },
 };
 
+const requestPhone = () => {
+ const data = {
+  eventType: EVENT_REQUEST_PHONE,
+ }
+ window?.parent?.postMessage(JSON.stringify(data), "*");
+}
+
 function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isPhoneRequestOpen, setIsPhoneRequestOpen] = useState(false);
+  const [phoneNumberRequestStatus, setPhoneNumberRequestStatus] = useState("");
 /*   const showModal = () => {
     setIsModalOpen(true);
   }; */
@@ -57,6 +68,13 @@ function Root() {
     setIsModalOpen(false);
   };
 
+  const handlePhoneRequest = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+    if (data.eventType === EVENT_PHONE_REQUEST_STATUS) {
+      setIsPhoneRequestOpen(true);
+      setPhoneNumberRequestStatus(data.status);
+    }
+  }
   useEffect(() => {
     const initApp = async () => {
       try {
@@ -76,12 +94,24 @@ function Root() {
           userContext.lang = lang;
         }
         setContext({ webApp: WebApp, userContext });
+        const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
+        if (!userDb?.phone_number) {
+          requestPhone();
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     initApp();
+    if (typeof window !== "undefined") {
+        window.addEventListener("message", handlePhoneRequest);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("message", handlePhoneRequest);
+      }
+    };
   }, []);
 
   if (isLoading) {
@@ -97,6 +127,16 @@ function Root() {
       <GlobalContext.Provider value={context}>
         <ConfigProvider theme={telegramTheme}>
           <App />
+          {isPhoneRequestOpen && (
+            <Modal
+              title="Phone number request"
+              open={isPhoneRequestOpen}
+              onOk={handleOk}
+              onCancel={handleCancel}
+            >
+              {phoneNumberRequestStatus}
+            </Modal>
+          )}
           {isDev && (
             <>
 {/*               <FloatButton
