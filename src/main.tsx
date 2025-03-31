@@ -86,7 +86,8 @@ function Root() {
           userContext.lang = lang;
         }
         if (WebApp.initDataUnsafe) {
-          console.log('initDataUnsafe', WebApp.initDataUnsafe, WebApp.initData);
+          const conntact = await WebApp.requestContact();
+          console.log('initDataUnsafe', WebApp.initDataUnsafe, WebApp.initData, conntact);
           const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
           if (!userDb?.phone_number) {
             requestPhone();

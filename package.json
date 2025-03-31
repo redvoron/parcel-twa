@@ -12,7 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "@telegram-apps/sdk": "^3.6.0",
-    "@twa-dev/sdk": "^6.7.1",
+    "@twa-dev/sdk": "^8.0.2",
     "antd": "^5.23.3",
     "axios": "^1.7.9",
     "i18next": "^24.2.2",
