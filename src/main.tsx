@@ -16,7 +16,6 @@ import {
 import { BrowserRouter } from "react-router-dom";
 
 const EVENT_REQUEST_PHONE = "web_app_request_phone";
-const EVENT_PHONE_REQUEST_STATUS = "phone_requested";
 const isDev = true;
 const defaultUserContext: UserContext = {
   lang: Lang.EN,
@@ -50,6 +49,7 @@ const requestPhone = () => {
  if (typeof window !== 'undefined') {
   console.log('try to post message', window?.parent);
   window?.parent?.postMessage(JSON.stringify(data), "*");
+  window?.TelegramWebviewProxy?.postEvent(EVENT_REQUEST_PHONE, {});
  }
 }
 
@@ -57,8 +57,6 @@ function Root() {
   const [context, setContext] = useState(globalContext);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPhoneRequestOpen, setIsPhoneRequestOpen] = useState(false);
-  const [phoneNumberRequestStatus, setPhoneNumberRequestStatus] = useState("");
 /*   const showModal = () => {
     setIsModalOpen(true);
   }; */
@@ -74,10 +72,6 @@ function Root() {
   const handlePhoneRequest = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
     console.log('handlePhoneRequest', data);
-    if (data.eventType === EVENT_PHONE_REQUEST_STATUS) {
-      setIsPhoneRequestOpen(true);
-      setPhoneNumberRequestStatus(data.status);
-    }
   }
   useEffect(() => {
     const initApp = async () => {
@@ -97,11 +91,14 @@ function Root() {
           i18n.changeLanguage(lang);
           userContext.lang = lang;
         }
-        setContext({ webApp: WebApp, userContext });
-        const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
-        if (!userDb?.phone_number) {
-          requestPhone();
+        if (WebApp.initDataUnsafe) {
+          console.log('initDataUnsafe', WebApp.initDataUnsafe);
+          const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
+          if (!userDb?.phone_number) {
+            requestPhone();
+          }
         }
+        setContext({ webApp: WebApp, userContext });
       } finally {
         setIsLoading(false);
       }
@@ -132,16 +129,6 @@ function Root() {
       <GlobalContext.Provider value={context}>
         <ConfigProvider theme={telegramTheme}>
           <App />
-          {isPhoneRequestOpen && (
-            <Modal
-              title="Phone number request"
-              open={isPhoneRequestOpen}
-              onOk={handleOk}
-              onCancel={handleCancel}
-            >
-              {phoneNumberRequestStatus}
-            </Modal>
-          )}
           {isDev && (
             <>
 {/*               <FloatButton
