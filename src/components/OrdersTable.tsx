@@ -427,6 +427,7 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
           position: ["bottomCenter"],
           size: "small",
           hideOnSinglePage: true,
+          pageSize: 100,
         }}
       />
     </>
