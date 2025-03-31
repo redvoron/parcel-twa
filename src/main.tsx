@@ -47,7 +47,10 @@ const requestPhone = () => {
  const data = {
   eventType: EVENT_REQUEST_PHONE,
  }
- window?.parent?.postMessage(JSON.stringify(data), "*");
+ if (typeof window !== 'undefined') {
+  console.log('try to post message', window?.parent);
+  window?.parent?.postMessage(JSON.stringify(data), "*");
+ }
 }
 
 function Root() {
@@ -70,6 +73,7 @@ function Root() {
 
   const handlePhoneRequest = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
+    console.log('handlePhoneRequest', data);
     if (data.eventType === EVENT_PHONE_REQUEST_STATUS) {
       setIsPhoneRequestOpen(true);
       setPhoneNumberRequestStatus(data.status);
@@ -105,6 +109,7 @@ function Root() {
 
     initApp();
     if (typeof window !== "undefined") {
+      console.log('try to add event listener');
         window.addEventListener("message", handlePhoneRequest);
     }
     return () => {
