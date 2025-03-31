@@ -7,7 +7,11 @@ import "./index.css";
 import WebApp from "@twa-dev/sdk";
 import { RequestContactResponse } from "@twa-dev/types";
 import { LoadingOutlined } from "@ant-design/icons";
-import { authenticateUser, getUserProfile, updateUserPhoneByTelegramId } from "./data/users.ts";
+import {
+  authenticateUser,
+  getUserProfile,
+  updateUserPhoneByTelegramId,
+} from "./data/users.ts";
 import {
   AuthResultType,
   GlobalContextType,
@@ -44,18 +48,24 @@ const telegramTheme = {
 
 const requestPhone = async () => {
   await WebApp.requestContact(onContact);
-}
+};
 
-const onContact = async (access: boolean, response?: RequestContactResponse) => {
-  if (access && response && 'responseUnsafe' in response) {
-    const contact = response.responseUnsafe.contact as { phone_number: string; user_id: number };
+const onContact = async (
+  access: boolean,
+  response?: RequestContactResponse
+) => {
+  if (access && response && "responseUnsafe" in response) {
+    const contact = response.responseUnsafe.contact as {
+      phone_number: string;
+      user_id: number;
+    };
     const phoneNumber = contact.phone_number;
     const telegramUserId = String(contact.user_id);
     if (phoneNumber) {
       await updateUserPhoneByTelegramId(telegramUserId, phoneNumber);
     }
   }
-}
+};
 
 function Root() {
   const [context, setContext] = useState(globalContext);
@@ -89,7 +99,9 @@ function Root() {
           userContext.lang = lang;
         }
         if (WebApp.initDataUnsafe) {
-          const userDb = await getUserProfile(telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37");
+          const userDb = await getUserProfile(
+            telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37"
+          );
           if (!userDb?.phone_number) {
             requestPhone();
           }
@@ -118,7 +130,7 @@ function Root() {
           <App />
           {isDev && (
             <>
-{/*               <FloatButton
+              {/*               <FloatButton
                 icon={<UserOutlined />}
                 onClick={showModal}
                 style={{ position: "absolute", top: 10, right: 10 }}
