@@ -5,6 +5,7 @@ import Chat from "./Chat";
 import { getUserProfile } from "../data/users";
 
 const MESSAGE_READ_INTERVAL = 10000;
+const isDev = import.meta.env.DEV;
 const ChatMain = ({ companionId, orderId }: { companionId?: string; orderId?: string }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const { userContext } = useContext(GlobalContext);
@@ -12,8 +13,8 @@ const ChatMain = ({ companionId, orderId }: { companionId?: string; orderId?: st
   
 
    //TODO: remove mock userId
-  const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
-  const getMessages = async () => {
+   const userId = userContext?.data || (isDev && "19b31340-f88c-48dc-bc97-cbe80427ba37") || "0";
+   const getMessages = async () => {
     if (!companionId || !orderId) {
       return;
     }

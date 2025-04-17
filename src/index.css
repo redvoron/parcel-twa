@@ -79,8 +79,7 @@ input, select, textarea, label {
 }
 .top-menu-item {
   margin-left: -0px !important;
-  padding-inline: 16px !important;
-  margin-right: 0 !important;
+  padding-inline: 16px 40px !important;
   width: 100% !important;
   text-transform: uppercase;
 }

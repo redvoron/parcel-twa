@@ -12,13 +12,15 @@ interface OrdersPageProps {
   extraParams?: GetOrdersParams;
 }
 
+const isDev = import.meta.env.DEV;
+
 const OrdersPage = ({ type, extraParams }: OrdersPageProps) => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const userContext = useContext(GlobalContext);
+  const { userContext } = useContext(GlobalContext);
   //TODO: remove mock userId
-  const currentUserId = userContext?.userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
-  
+  const currentUserId = userContext?.data || (isDev && "19b31340-f88c-48dc-bc97-cbe80427ba37") || "0";
+
   const reqUserId = userId ? userId : currentUserId;
 
   useEffect(() => {

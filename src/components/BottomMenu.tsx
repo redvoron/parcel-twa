@@ -6,13 +6,14 @@ import { messagesApi } from "../data/messages";
 import { GlobalContext } from "../main";
 
 const HELP_CHAT_USERNAME = import.meta.env.VITE_HELP_CHAT_USERNAME;
+const isDev = import.meta.env.DEV;
+
 const BottomMenu = () => {
   const [messagesCount, setMessagesCount] = useState(0);
   const { userContext } = useContext(GlobalContext);
   const navigate = useNavigate();
   //TODO: remove mock userId
-  const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
-
+  const userId = userContext?.data || (isDev && "19b31340-f88c-48dc-bc97-cbe80427ba37") || "0";
   const handleTelegramChat = () => {
     window.open(`https://t.me/${HELP_CHAT_USERNAME}`, "_blank");
   };

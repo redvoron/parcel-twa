@@ -23,6 +23,8 @@ const gridStyleFull: React.CSSProperties = {
   gap: 10,
 };
 
+const isDev = import.meta.env.DEV;
+
 const OrderView = ({ orderId }: { orderId: number }) => {
   const { t } = useTranslation();
   const { userContext } = useContext(GlobalContext);
@@ -35,7 +37,7 @@ const OrderView = ({ orderId }: { orderId: number }) => {
   });
   const lang = userContext?.lang || Lang.EN;
   //TODO: remove mock userId
-  const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
+  const userId = userContext?.data || (isDev && "19b31340-f88c-48dc-bc97-cbe80427ba37") || "0";
 
   const getTitle = useMemo(() => {
     if (!order?.type) {

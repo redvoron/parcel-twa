@@ -36,6 +36,7 @@ interface OrderFormProps {
   mode: FormModes;
   orderId?: number;
 }
+const isDev = import.meta.env.DEV;
 
 const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [form] = Form.useForm();
@@ -57,7 +58,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const { t } = useTranslation();
   const lang = userContext?.lang || Lang.EN;
   //TODO: remove mock userId
-  const userId = userContext?.data || "19b31340-f88c-48dc-bc97-cbe80427ba37";
+  const userId = userContext?.data || (isDev && "19b31340-f88c-48dc-bc97-cbe80427ba37") || "0";
 
   const onFinish = async (values: OrderData) => {
     let finishResult = false;
