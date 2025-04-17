@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Menu } from "antd";
 import { useNavigate } from "react-router-dom";
 import BottomMenu from "../components/BottomMenu";
-import { SendIcon, TruckIcon } from "lucide-react";
+import { SendIcon, TruckIcon, UserRoundIcon } from "lucide-react";
 import { GlobalContext } from "../main";
 import { useContext } from "react";
 const MainPage = () => {
@@ -44,6 +44,13 @@ const MainPage = () => {
           onClick: () => handleCellClick("/orders/create/pickup"),
         },
       ],
+    },
+    {
+      key: 'help',
+      label: t("orders-my"),
+      icon: <UserRoundIcon />,
+      className: "ant-menu-submenu top-menu-item",
+      onClick: () => handleCellClick("/orders/my"),
     },
   ];
   

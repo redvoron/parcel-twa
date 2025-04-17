@@ -43,4 +43,8 @@ export const routes = {
     path: '/chat/:orderId/:userId',
     name: 'chat',
   },
+  help: {
+    path: '/help',
+    name: 'help',
+  },
 };

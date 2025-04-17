@@ -77,6 +77,13 @@ input, select, textarea, label {
 .telegram-menu {
   margin-top: 48px;
 }
+.top-menu-item {
+  margin-left: -0px !important;
+  padding-inline: 16px !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  text-transform: uppercase;
+}
 .telegram-menu .ant-menu-submenu {
   background-color: #007bff;
   .ant-menu-item-icon {

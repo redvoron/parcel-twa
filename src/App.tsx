@@ -6,6 +6,7 @@ import { FormModes, OrdersViewType } from "./utils/constants";
 import { routes } from "./utils/routes";
 import OrderPage from "./pages/OrderPage";
 import ChatPage from "./pages/ChatPage";
+import HelpPage from "./pages/HelpPage";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import WebApp from "@twa-dev/sdk";
@@ -35,6 +36,7 @@ function App() {
         <Route path={routes.orderCreate.path} element={<OrderPage mode={FormModes.CREATE} />} />
         <Route path={routes.orderView.path} element={<OrderPage mode={FormModes.VIEW} />} />
         <Route path={routes.chat.path} element={<ChatPage />} />
+        <Route path={routes.help.path} element={<HelpPage />} />
       </Routes>
   );
 }

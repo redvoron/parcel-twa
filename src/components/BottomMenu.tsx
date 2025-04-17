@@ -1,6 +1,6 @@
 import { Badge, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { HomeIcon, UserRoundIcon, HelpCircleIcon } from "lucide-react";
+import { HomeIcon, UserRoundIcon, MessageCircleQuestionIcon, FileQuestionIcon } from "lucide-react";
 import { useEffect, useState, useContext } from "react";
 import { messagesApi } from "../data/messages";
 import { GlobalContext } from "../main";
@@ -55,7 +55,18 @@ const BottomMenu = () => {
       />
       <Button
         type="link"
-        icon={<HelpCircleIcon />}
+        icon={<FileQuestionIcon />}
+        size="large"
+        style={{
+          outline: "none",
+          backgroundColor: "transparent"
+        }}
+        className="no-hover"
+        onClick={() => navigate("/help")}
+      ></Button>
+      <Button
+        type="link"
+        icon={<MessageCircleQuestionIcon />}
         size="large"
         style={{
           outline: "none",
