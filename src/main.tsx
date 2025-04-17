@@ -88,7 +88,6 @@ function Root() {
           ...telegramUserData,
           lang: Lang.EN,
         };
-        console.log('WebApp.initDataUnsafe', WebApp.initDataUnsafe)
         if (
           WebApp.initDataUnsafe &&
           Object.values(Lang).includes(
@@ -96,7 +95,6 @@ function Root() {
           )
         ) {
           const lang = WebApp.initDataUnsafe.user?.language_code as Lang;
-          console.log('lang', lang)
           i18n.changeLanguage(lang);
           userContext.lang = lang;
         }
@@ -109,7 +107,6 @@ function Root() {
           }
         }
         setContext({ webApp: WebApp, userContext });
-        console.log('context', context)
       } finally {
         setIsLoading(false);
       }

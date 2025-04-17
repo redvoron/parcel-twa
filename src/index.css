@@ -117,8 +117,9 @@ input, select, textarea, label {
 .no-hover:active,
 .no-hover:focus {
   background-color: transparent !important;
-  color: inherit !important;
+  color: #007bff !important;
   border-color: transparent !important;
+  outline: none !important;
 }
 
 .no-hover::after {
