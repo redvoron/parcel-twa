@@ -82,6 +82,9 @@ input, select, textarea, label {
   padding-inline: 16px 40px !important;
   width: 100% !important;
   text-transform: uppercase;
+  &:hover {
+    background-color: #007bff !important;
+  }
 }
 .telegram-menu .ant-menu-submenu {
   background-color: #007bff;
