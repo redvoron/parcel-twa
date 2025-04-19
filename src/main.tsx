@@ -102,6 +102,7 @@ function Root() {
           const userDb = await getUserProfile(
             telegramUserData.data || "19b31340-f88c-48dc-bc97-cbe80427ba37"
           );
+          //@ts-expect-error - phone_number is optional
           if (!userDb?.phone_number) {
             requestPhone();
           }
