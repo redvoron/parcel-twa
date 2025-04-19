@@ -50,6 +50,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
   const [sizesTypes, setSizesTypes] = useState<SizesType[]>([]);
   const [isExactSizes, setIsExactSizes] = useState<boolean>(false);
   const [isNeedCargoTypeDescription, setIsNeedCargoTypeDescription] = useState<boolean>(false);
+  const [isClosestDate, setIsClosestDate] = useState<boolean>(false);
   const { userContext } = useContext(GlobalContext);
   const navigate = useNavigate();
   const [orderType, setOrderType] = useState<OrdersTypes>(
@@ -306,17 +307,29 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
               />
             </Form.Item>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "16px",
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                gap: "16px",
             }}
           >
+            <Checkbox onChange={(value) => {
+              console.log('value', value);
+              const isChecked =  value?.target?.checked;
+              setIsClosestDate(isChecked);
+            }} style={{ width: "100%" }}>
+              <span style={{ fontSize: "16px"}}>
+                {t("closest-date")}
+              </span>
+            </Checkbox>
             <Form.Item
               name="from_date"
               label={t("departure")}
-              rules={[{ required: true, message: t("from-date-error") }]}
+              rules={[{ required: !isClosestDate, message: t("from-date-error") }]}
+              style={{ width: "45%" }}
             >
               <DatePicker
                 inputReadOnly={true}
@@ -326,6 +339,7 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
                   form.setFieldsValue({ from_date: value });
                 }}
                 placeholder={t("select-date")}
+                disabled={isClosestDate}
                 size="large"
               />
             </Form.Item>
@@ -333,7 +347,8 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
             <Form.Item
               name="to_date"
               label={t("arrival")}
-              rules={[{ required: true, message: t("to-date-error") }]}
+              rules={[{ required: !isClosestDate, message: t("to-date-error") }]}
+              style={{ width: "45%" }}
             >
               <DatePicker
                 inputReadOnly={true}
@@ -342,10 +357,12 @@ const OrderForm: FC<OrderFormProps> = ({ type, mode, orderId }) => {
                 onChange={(value) => {
                   form.setFieldsValue({ to_date: value });
                 }}
+                disabled={isClosestDate}
                 placeholder={t("select-date")}
                 size="large"
               />
             </Form.Item>
+
           </div>
 
           {orderType === OrdersTypes.DELIVERY && (

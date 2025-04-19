@@ -75,7 +75,7 @@ input, select, textarea, label {
   }
 }
 .telegram-menu {
-  margin-top: 48px;
+  margin-top: 24px;
 }
 .top-menu-item {
   margin-left: -0px !important;
@@ -85,6 +85,12 @@ input, select, textarea, label {
   &:hover {
     background-color: #007bff !important;
   }
+}
+.submenu-info {
+  height: 100% !important;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: auto;
 }
 .telegram-menu .ant-menu-submenu {
   background-color: #007bff;

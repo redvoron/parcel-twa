@@ -340,6 +340,12 @@ const OrdersTable = ({ viewType, userId, extraParams }: OrdersTableProps) => {
                 .includes(value.toLowerCase()) ||
               record.to_city_data?.name_en
                 .toLowerCase()
+                .includes(value.toLowerCase()) || 
+              record.from_city_data?.country_ru
+                .toLowerCase()
+                .includes(value.toLowerCase()) ||
+              record.to_city_data?.country_ru
+                .toLowerCase()
                 .includes(value.toLowerCase())
             );
           });

@@ -76,3 +76,10 @@ export enum Lang {
   RU = "ru",
   EN = "en",
 }
+
+export enum UserProfileFields {
+  FIRST_NAME = "first_name",
+  LAST_NAME = "last_name",
+  PHONE = "phone_number",
+  EMAIL = "email",
+}

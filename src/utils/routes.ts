@@ -47,4 +47,8 @@ export const routes = {
     path: '/help',
     name: 'help',
   },
+  profile: {
+    path: '/profile',
+    name: 'profile',
+  },
 };

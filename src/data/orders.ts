@@ -289,7 +289,7 @@ export const ordersApi = {
     if (userId) {
       queryOr.push(`customer_id.eq.${userId},courier_id.eq.${userId}`);
     } else if(!orderId) {
-      query = query.gt('data->>from_date', new Date().toISOString());
+      queryOr.push(`data->>from_date.gte.${new Date().toISOString()},data->>from_date.is.null`);
     }
 
     if (role) {

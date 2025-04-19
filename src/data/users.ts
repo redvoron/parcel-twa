@@ -1,5 +1,9 @@
 import supabase from "./supabaseClient";
-import { AuthResult, AuthResultType } from "../utils/constants";
+import {
+  AuthResult,
+  AuthResultType,
+  UserProfileFields,
+} from "../utils/constants";
 
 export const updateUserMeta = async (userId: string, userMeta: string) => {
   try {
@@ -115,34 +119,43 @@ export const authenticateUser = async (
   }
 };
 
-export const updateUsersPhone = async (userId: string, phone_number: string) => {
-  const { data, error } = await supabase.from("users").update({ phone_number }).eq("auth_id", userId);
+export const updateUserPhoneByTelegramId = async (
+  telegramId: string,
+  phone_number: string
+) => {
+  const { data, error } = await supabase
+    .from("users")
+    .update({ phone_number })
+    .eq("telegram_id", telegramId);
   if (error) {
     console.error("Error updating user phone:", error);
-  }
-  return data;
-};
-
-export const updateUserPhoneByTelegramId = async (telegramId: string, phone_number: string) => {
-  const { data, error } = await supabase.from("users").update({ phone_number }).eq("telegram_id", telegramId);
-  if (error) {
-    console.error("Error updating user phone:", error);
-  }
-  return data;
-};
-
-export const updateUsersEmail = async (userId: string, email: string) => {
-  const { data, error } = await supabase.from("users").update({ email }).eq("auth_id", userId);
-  if (error) {
-    console.error("Error updating user email:", error);
   }
   return data;
 };
 
 export const getUserProfile = async (userId: string) => {
-    const { data, error } = await supabase.from("users").select("*").eq("auth_id", userId).single();
-    if (error) {
-        console.error("Error getting profiles:", error);
-    }
-    return data;
+  const { data, error } = await supabase
+    .rpc("get_user_profile", {
+      auth_id_param: userId,
+    })
+    .single();
+  if (error) {
+    console.error("Error getting profiles:", error);
+  }
+  return data;
+};
+
+export const updateUserProfile = async (
+  userId: string,
+  profile: UserProfileFields
+) => {
+  const { data, error } = await supabase
+    .from("users")
+    .update(profile)
+    .eq("auth_id", userId)
+    .select();
+  if (error) {
+    console.error("Error updating user profile:", error);
+  }
+  return data;
 };
